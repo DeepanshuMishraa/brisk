@@ -4,12 +4,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface DurationSelectProps {
-  value: string
-  onValueChange: (value: string) => void
+  value: string;
+  onValueChange: (value: string) => void;
 }
 
 export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
@@ -19,13 +19,14 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
         Duration
       </label>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className={cn(
-          // Glassy select with black background
-          "flex-1 rounded-md text-white w-full",
-          "bg-black/70 border-white/15 backdrop-blur-xl",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-          "focus-visible:border-white/25 focus-visible:ring-white/10"
-        )}>
+        <SelectTrigger
+          className={cn(
+            "flex-1 rounded-md text-white w-full",
+            "bg-black/70 border-white/15 backdrop-blur-xl",
+            "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
+            "focus-visible:border-white/25 focus-visible:ring-white/10",
+          )}
+        >
           <SelectValue placeholder="Select duration" />
         </SelectTrigger>
         <SelectContent className="bg-black/70 border-white/15 text-white backdrop-blur-xl">
@@ -34,7 +35,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             15 minutes
@@ -44,7 +45,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             30 minutes
@@ -54,7 +55,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             1 hour
@@ -64,7 +65,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             2 hours
@@ -74,7 +75,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             3 hours
@@ -84,7 +85,7 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
             className={cn(
               "text-white",
               "focus:bg-white/5 focus:backdrop-blur-xl",
-              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
             )}
           >
             4 hours
@@ -92,6 +93,5 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }
-
