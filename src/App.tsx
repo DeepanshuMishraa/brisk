@@ -114,7 +114,7 @@ export default function App() {
         });
       }, 1000);
 
-      alert(`Focus session started!\n${result}`);
+      alert(`Focus session started!\n\nIMPORTANT: Please restart your browser for site blocking to take effect.\n\nBrowsers cache DNS aggressively, so a restart is required after blocking sites.`);
     } catch (error) {
       console.error("Failed to start focus session:", error);
       alert(`Failed to start focus session: ${error}`);
