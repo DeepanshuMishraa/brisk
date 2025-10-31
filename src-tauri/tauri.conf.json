@@ -15,7 +15,8 @@
         "title": "focus",
         "maxHeight": 600,
         "maxWidth": 900,
-        "decorations": false
+        "decorations": false,
+        "transparent": true
       }
     ],
     "security": {
