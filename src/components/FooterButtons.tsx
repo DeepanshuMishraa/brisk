@@ -9,15 +9,8 @@ interface FooterButtonsProps {
   onViewStats?: () => void;
 }
 
-function formatTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-}
-
 export function FooterButtons({
   isSessionActive = false,
-  timeLeft = null,
   isLoading = false,
   onStartFocus,
   onViewStats,
@@ -46,7 +39,12 @@ export function FooterButtons({
         </Button>
       </div>
 
-      <Button size="sm" variant="ghost" onClick={onViewStats} disabled={isSessionActive}>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onViewStats}
+        disabled={isSessionActive}
+      >
         <span>View Stats</span>
       </Button>
     </div>

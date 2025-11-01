@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -119,7 +120,8 @@
     * {
         @apply border-border outline-ring/50;
     }
-    html, body {
+    html,
+    body {
         @apply bg-transparent text-foreground;
         background-color: transparent;
         margin: 0;
@@ -134,4 +136,9 @@
         margin: 0;
         padding: 0;
     }
+}
+
+@font-face {
+    font-family: "Jetbrains Mono";
+    src: url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 }

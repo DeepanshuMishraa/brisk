@@ -18,7 +18,7 @@ export function FocusWidget({ goal, duration, timeLeft }: FocusWidgetProps) {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const widgetRef = useRef<HTMLDivElement>(null);
-  const progress = Math.min(((duration - timeLeft) / duration) * 100, 100);
+  const progress = duration > 0 ? Math.min(((duration - timeLeft) / duration) * 100, 100) : 0;
 
   useEffect(() => {
     const handleMouseDown = async (e: MouseEvent) => {
@@ -77,54 +77,23 @@ export function FocusWidget({ goal, duration, timeLeft }: FocusWidgetProps) {
   return (
     <div
       ref={widgetRef}
-      className="relative w-full h-full max-w-[400px] max-h-[80px] rounded-2xl bg-[#1a1a1a] border border-white/10 shadow-xl overflow-hidden cursor-move select-none"
-      style={{
+      className="relative flex h-[72px] w-[380px] select-none rounded-2xl border border-white/8 bg-[#0f0f0f] shadow-[0_16px_45px_rgba(0,0,0,0.45)]"
+      style={{ 
         cursor: isDragging ? "grabbing" : "grab",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-        width: "400px",
-        height: "80px",
+        fontFamily: '"JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace'
       }}
     >
-      <div className="absolute inset-0 bg-[#1a1a1a]" />
+      <div className="pointer-events-none absolute inset-px rounded-[22px] border border-white/10" />
       <div
-        className="absolute inset-0 transition-all duration-300 ease-out"
-        style={{
-          background: "linear-gradient(90deg, rgba(34, 197, 94, 0.95) 0%, rgba(74, 222, 128, 0.95) 50%, rgba(34, 197, 94, 0.95) 100%)",
-          clipPath: `inset(0 ${100 - progress}% 0 0)`,
-          willChange: "clip-path",
-        }}
+        className="pointer-events-none absolute inset-1 rounded-[22px] bg-white/4 transition-[clip-path] duration-500 ease-out"
+        style={{ clipPath: `inset(0 ${100 - progress}% 0 0)` }}
       />
-      <div
-        className="absolute inset-0 pointer-events-none transition-all duration-300 ease-out"
-        style={{
-          background: `linear-gradient(90deg, 
-            transparent 0%, 
-            rgba(34, 197, 94, 0.5) ${Math.max(0, progress - 5)}%, 
-            rgba(74, 222, 128, 0.8) ${Math.max(0, progress - 2)}%, 
-            rgba(34, 197, 94, 0.6) ${progress}%, 
-            rgba(74, 222, 128, 0.4) ${Math.min(100, progress + 2)}%, 
-            transparent 100%)`,
-          willChange: "background",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none opacity-30 transition-all duration-300 ease-out"
-        style={{
-          background: `linear-gradient(180deg, 
-            rgba(255, 255, 255, 0.2) 0%, 
-            transparent 50%)`,
-          clipPath: `inset(0 ${100 - progress}% 0 0)`,
-          willChange: "clip-path",
-        }}
-      />
-      <div className="relative z-10 flex items-center h-full px-5 gap-4">
-        <div className="shrink-0 px-4 py-2.5 rounded-full bg-[#252525] border border-white/5 shadow-inner">
-          <span className="text-lg font-mono text-gray-200 font-semibold leading-none whitespace-nowrap">
-            {formatTime(timeLeft)}
-          </span>
+      <div className="relative z-10 flex flex-1 items-center gap-4 px-6">
+        <div className="shrink-0 rounded-xl bg-[#181818] px-4 py-2.5 text-lg leading-none text-gray-100">
+          {formatTime(timeLeft)}
         </div>
-        <div className="flex-1 overflow-hidden min-w-0 pr-2">
-          <span className="text-base text-gray-200 font-medium truncate block leading-tight">
+        <div className="flex-1 min-w-0">
+          <span className="block truncate text-sm tracking-tight text-gray-200/90">
             {goal}
           </span>
         </div>
