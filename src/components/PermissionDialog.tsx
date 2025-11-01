@@ -1,6 +1,8 @@
 import { Shield, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { invoke } from "@tauri-apps/api/core";
+import { useState } from "react";
 
 interface PermissionDialogProps {
   onGrant: () => void;
@@ -8,6 +10,21 @@ interface PermissionDialogProps {
 }
 
 export function PermissionDialog({ onGrant, onDeny }: PermissionDialogProps) {
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
+
+  const handleGrant = async () => {
+    setIsAuthorizing(true);
+    try {
+      await invoke<string>("authorize_admin");
+      onGrant();
+    } catch (error) {
+      alert(`Authorization failed: ${error}\n\nYou can still use the app, but you'll be prompted for your password when blocking sites.`);
+      onGrant();
+    } finally {
+      setIsAuthorizing(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4">
@@ -42,7 +59,7 @@ export function PermissionDialog({ onGrant, onDeny }: PermissionDialogProps) {
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-6 flex items-start gap-2">
             <AlertCircle className="size-4 text-yellow-400 shrink-0 mt-0.5" />
             <p className="text-yellow-300 text-xs">
-              You'll be prompted for your password when blocking/unblocking sites. This is a one-time prompt per session.
+              You'll be prompted for your password once when granting permission. After that, you won't be asked again for 15 minutes.
             </p>
           </div>
           <div className="flex gap-3">
@@ -57,14 +74,25 @@ export function PermissionDialog({ onGrant, onDeny }: PermissionDialogProps) {
               Deny
             </Button>
             <Button
-              onClick={onGrant}
+              onClick={handleGrant}
+              disabled={isAuthorizing}
               className={cn(
                 "flex-1 bg-blue-500 hover:bg-blue-600 text-white",
-                "border-0 shadow-lg shadow-blue-500/20"
+                "border-0 shadow-lg shadow-blue-500/20",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-              <CheckCircle2 className="size-4 mr-2" />
-              Grant Permission
+              {isAuthorizing ? (
+                <>
+                  <div className="size-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Authorizing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="size-4 mr-2" />
+                  Grant Permission
+                </>
+              )}
             </Button>
           </div>
         </div>

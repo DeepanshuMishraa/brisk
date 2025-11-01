@@ -31,6 +31,16 @@ export function DurationSelect({ value, onValueChange }: DurationSelectProps) {
         </SelectTrigger>
         <SelectContent className="bg-black/70 border-white/15 text-white backdrop-blur-xl">
           <SelectItem
+            value="1 minute"
+            className={cn(
+              "text-white",
+              "focus:bg-white/5 focus:backdrop-blur-xl",
+              "focus:border-white/10 focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
+            )}
+          >
+            1 minute
+          </SelectItem>
+          <SelectItem
             value="15 minutes"
             className={cn(
               "text-white",

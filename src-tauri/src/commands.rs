@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
 use std::path::Path;
+use tauri::{AppHandle, Manager, PhysicalSize};
 
 use crate::block;
 
@@ -13,14 +14,35 @@ pub struct Store {
     blocked_things: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Session {
+    goal: String,
+    duration: u64,
+    blocked_things: Vec<String>,
+    timestamp: i64,
+}
+
 type Result<T> = std::result::Result<T, String>;
 const STORAGE_DIR: &str = "/home/dipxsy/.focus_sessions";
 
+/// Authorize once at app start - extends sudo timestamp for 15 minutes
 #[tauri::command]
-pub fn create_and_store_session(goal: String, duration: u64, blocked_things: Vec<String>) -> Result<String> {
+pub fn authorize_admin() -> Result<String> {
+    block::authorize_once()
+        .map(|_| {
+            "Authorization successful. You won't be prompted again for 15 minutes.".to_string()
+        })
+        .map_err(|e| format!("Authorization failed: {}", e))
+}
+
+#[tauri::command]
+pub fn create_and_store_session(
+    goal: String,
+    duration: u64,
+    blocked_things: Vec<String>,
+) -> Result<String> {
     if !blocked_things.is_empty() {
-        block::block_sites(&blocked_things)
-            .map_err(|e| format!("Failed to block sites: {}", e))?;
+        block::block_sites(&blocked_things).map_err(|e| format!("Failed to block sites: {}", e))?;
     }
     let store = Store {
         goal,
@@ -52,7 +74,247 @@ pub fn create_and_store_session(goal: String, duration: u64, blocked_things: Vec
 
 #[tauri::command]
 pub fn unblock_all_sites() -> Result<String> {
-    block::unblock_sites()
-        .map_err(|e| format!("Failed to unblock sites: {}", e))?;
+    block::unblock_sites().map_err(|e| format!("Failed to unblock sites: {}", e))?;
     Ok("Sites unblocked successfully".to_string())
+}
+
+#[tauri::command]
+pub fn get_all_sessions() -> Result<Vec<Session>> {
+    let dir = Path::new(STORAGE_DIR);
+
+    if !dir.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut sessions = Vec::new();
+
+    let entries = fs::read_dir(dir).map_err(|e| format!("Failed to read directory: {}", e))?;
+
+    for entry in entries {
+        let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+        let path = entry.path();
+
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
+            if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                // Extract timestamp from filename: session_1762021023.json
+                if let Some(timestamp_str) = file_name
+                    .strip_prefix("session_")
+                    .and_then(|s| s.strip_suffix(".json"))
+                {
+                    if let Ok(timestamp) = timestamp_str.parse::<i64>() {
+                        let content = fs::read_to_string(&path).map_err(|e| {
+                            format!("Failed to read file {}: {}", path.display(), e)
+                        })?;
+
+                        let store: Store = serde_json::from_str(&content).map_err(|e| {
+                            format!("Failed to parse JSON in {}: {}", path.display(), e)
+                        })?;
+
+                        sessions.push(Session {
+                            goal: store.goal,
+                            duration: store.duration,
+                            blocked_things: store.blocked_things,
+                            timestamp,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort by timestamp descending (newest first)
+    sessions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+    Ok(sessions)
+}
+
+const MAIN_WINDOW_WIDTH: u32 = 1600;
+const MAIN_WINDOW_HEIGHT: u32 = 1200;
+const MAIN_WINDOW_MIN_WIDTH: u32 = 900;
+const MAIN_WINDOW_MIN_HEIGHT: u32 = 600;
+
+const STATS_WINDOW_WIDTH: u32 = 1600;
+const STATS_WINDOW_HEIGHT: u32 = 1200;
+
+const WIDGET_WINDOW_WIDTH: u32 = 400;
+const WIDGET_WINDOW_HEIGHT: u32 = 80;
+
+#[tauri::command]
+pub async fn resize_window_to_widget(app: AppHandle) -> Result<String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    let _ = window.unmaximize();
+    let _ = window.set_fullscreen(false);
+
+    window
+        .set_size(PhysicalSize::new(WIDGET_WINDOW_WIDTH, WIDGET_WINDOW_HEIGHT))
+        .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+    window
+        .set_min_size(Some(PhysicalSize::new(
+            WIDGET_WINDOW_WIDTH,
+            WIDGET_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set min size: {}", e))?;
+
+    window
+        .set_max_size(Some(PhysicalSize::new(
+            WIDGET_WINDOW_WIDTH,
+            WIDGET_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set max size: {}", e))?;
+
+    window
+        .set_always_on_top(true)
+        .map_err(|e| format!("Failed to set always on top: {}", e))?;
+
+    Ok("Window resized to widget size".to_string())
+}
+
+#[tauri::command]
+pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    // Ensure window is not maximized or fullscreen first
+    let _ = window.set_fullscreen(false);
+    let _ = window.unmaximize();
+    let _ = window.set_always_on_top(false);
+
+    // Ensure window is visible and focused
+    let _ = window.show();
+    let _ = window.set_focus();
+
+    // First, ensure window is resizable
+    window
+        .set_resizable(true)
+        .map_err(|e| format!("Failed to set window resizable: {}", e))?;
+
+    // Step 1: Clear ALL constraints first to remove stats/widget mode restrictions
+    window
+        .set_max_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to remove max size: {}", e))?;
+
+    window
+        .set_min_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to clear min size: {}", e))?;
+
+    // Small delay to ensure constraints are cleared
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    // Step 2: Set both min and max to 900x600 to lock the window at that size
+    window
+        .set_min_size(Some(PhysicalSize::new(
+            MAIN_WINDOW_WIDTH,
+            MAIN_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set min size: {}", e))?;
+
+    window
+        .set_max_size(Some(PhysicalSize::new(
+            MAIN_WINDOW_WIDTH,
+            MAIN_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set max size: {}", e))?;
+
+    // Step 3: Set the window size to main dimensions
+    window
+        .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
+        .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+    // Small delay to ensure size is applied
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    // Verify the size was set correctly, retry if needed
+    let current_size = window
+        .inner_size()
+        .map_err(|e| format!("Failed to get current size: {}", e))?;
+
+    if current_size.width != MAIN_WINDOW_WIDTH || current_size.height != MAIN_WINDOW_HEIGHT {
+        println!(
+            "Warning: Window size is {}x{}, retrying...",
+            current_size.width, current_size.height
+        );
+
+        // Try again with more aggressive approach
+        window
+            .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
+            .map_err(|e| format!("Failed to retry window size: {}", e))?;
+
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+
+    let _ = window.center();
+
+    let final_size = window
+        .inner_size()
+        .map_err(|e| format!("Failed to get final size: {}", e))?;
+    println!(
+        "Window resized to main size: {}x{} (requested: {}x{})",
+        final_size.width, final_size.height, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
+    );
+
+    Ok(format!(
+        "Window resized to main size: {}x{}",
+        final_size.width, final_size.height
+    ))
+}
+
+#[tauri::command]
+pub async fn resize_window_to_stats(app: AppHandle) -> Result<String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+    
+    let _ = window.set_fullscreen(false);
+    let _ = window.unmaximize();
+    let _ = window.set_always_on_top(false);
+    let _ = window.show();
+    let _ = window.set_focus();
+    
+    
+    window
+        .set_resizable(true)
+        .map_err(|e| format!("Failed to set window resizable: {}", e))?;
+    window
+        .set_max_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to remove max size: {}", e))?;
+
+    window
+        .set_min_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to clear min size: {}", e))?;
+    window
+        .set_min_size(Some(PhysicalSize::new(
+            STATS_WINDOW_WIDTH,
+            STATS_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set min size: {}", e))?;
+
+    window
+        .set_max_size(Some(PhysicalSize::new(
+            STATS_WINDOW_WIDTH,
+            STATS_WINDOW_HEIGHT,
+        )))
+        .map_err(|e| format!("Failed to set max size: {}", e))?;
+    window
+        .set_size(PhysicalSize::new(STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT))
+        .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+    let _ = window.center();
+
+    let current_size = window
+        .inner_size()
+        .map_err(|e| format!("Failed to get current size: {}", e))?;
+    println!(
+        "Window resized to stats size: {}x{} (requested: {}x{})",
+        current_size.width, current_size.height, STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT
+    );
+
+    Ok(format!(
+        "Window resized to stats size: {}x{}",
+        current_size.width, current_size.height
+    ))
 }

@@ -13,10 +13,16 @@
     "windows": [
       {
         "title": "focus",
-        "maxHeight": 600,
-        "maxWidth": 900,
+        "label": "main",
+        "width": 1600,
+        "height": 1200,
+        "minWidth": 900,
+        "minHeight": 600,
+        "maxWidth": 1600,
+        "maxHeight": 1200,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "resizable": true
       }
     ],
     "security": {
