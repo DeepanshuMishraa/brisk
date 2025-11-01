@@ -124,10 +124,10 @@ pub fn get_all_sessions() -> Result<Vec<Session>> {
     Ok(sessions)
 }
 
-const MAIN_WINDOW_WIDTH: u32 = 900;
-const MAIN_WINDOW_HEIGHT: u32 = 600;
-const MAIN_WINDOW_MIN_WIDTH: u32 = 400;
-const MAIN_WINDOW_MIN_HEIGHT: u32 = 300;
+const MAIN_WINDOW_WIDTH: u32 = 1600;
+const MAIN_WINDOW_HEIGHT: u32 = 1200;
+const MAIN_WINDOW_MIN_WIDTH: u32 = 900;
+const MAIN_WINDOW_MIN_HEIGHT: u32 = 600;
 
 const STATS_WINDOW_WIDTH: u32 = 1600;
 const STATS_WINDOW_HEIGHT: u32 = 1200;
@@ -218,19 +218,35 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
     // Small delay to ensure size is applied
     std::thread::sleep(std::time::Duration::from_millis(50));
 
-    let _ = window.center();
-
+    // Verify the size was set correctly, retry if needed
     let current_size = window
         .inner_size()
         .map_err(|e| format!("Failed to get current size: {}", e))?;
+    
+    if current_size.width != MAIN_WINDOW_WIDTH || current_size.height != MAIN_WINDOW_HEIGHT {
+        println!("Warning: Window size is {}x{}, retrying...", current_size.width, current_size.height);
+        
+        // Try again with more aggressive approach
+        window
+            .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
+            .map_err(|e| format!("Failed to retry window size: {}", e))?;
+        
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+
+    let _ = window.center();
+
+    let final_size = window
+        .inner_size()
+        .map_err(|e| format!("Failed to get final size: {}", e))?;
     println!(
         "Window resized to main size: {}x{} (requested: {}x{})",
-        current_size.width, current_size.height, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
+        final_size.width, final_size.height, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
     );
 
     Ok(format!(
         "Window resized to main size: {}x{}",
-        current_size.width, current_size.height
+        final_size.width, final_size.height
     ))
 }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
+import { AnimatePresence, motion } from "motion/react";
 import "./App.css";
 import { BackButton } from "@/components/BackButton";
 import { GoalInput } from "@/components/GoalInput";
@@ -162,11 +163,45 @@ function MainPage() {
 }
 
 export default function App() {
+  const location = useLocation();
+  
   return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/widget" element={<WidgetPage />} />
-      <Route path="/stats" element={<StatsPage />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="w-full h-full"
+          >
+            <MainPage />
+          </motion.div>
+        } />
+        <Route path="/widget" element={
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="w-full h-full"
+          >
+            <WidgetPage />
+          </motion.div>
+        } />
+        <Route path="/stats" element={
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="w-full h-full"
+          >
+            <StatsPage />
+          </motion.div>
+        } />
+      </Routes>
+    </AnimatePresence>
   );
 }

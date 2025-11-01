@@ -82,7 +82,7 @@ export function StatsPage() {
     try {
       await invoke<string>("resize_window_to_main");
       // Wait longer to ensure resize completes
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 800));
     } catch (error) {
       console.error("Failed to resize to main:", error);
     }
@@ -108,7 +108,7 @@ export function StatsPage() {
           </div>
           <button
             onClick={handleStartNew}
-            className="px-5 py-2 bg-white text-black text-sm font-medium hover:bg-gray-200 transition-colors"
+            className="px-5 py-2 bg-white text-black text-sm font-medium hover:bg-gray-200 transition-colors rounded-md"
           >
             New Session
           </button>
@@ -125,11 +125,11 @@ export function StatsPage() {
               <div className="text-gray-500 text-sm font-light">No sessions yet</div>
             </div>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-2">
               {sessions.map((session) => (
                 <div
                   key={session.timestamp}
-                  className="group py-5 border-b border-white/5 hover:bg-white/5 transition-colors -mx-4 px-4"
+                  className="group py-5 px-4 rounded-lg border border-white/5 hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-8">
                     {/* Left: Goal and Time */}
@@ -164,7 +164,7 @@ export function StatsPage() {
                         {session.blocked_things.map((site, siteIndex) => (
                           <span
                             key={siteIndex}
-                            className="text-xs px-2 py-1 bg-white/5 text-gray-400 font-light"
+                            className="text-xs px-2 py-1 rounded bg-white/5 text-gray-400 font-light"
                           >
                             {site}
                           </span>

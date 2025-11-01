@@ -9,10 +9,18 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             if let Some(window) = app.get_webview_window("main") {
+                use tauri::PhysicalSize;
+                
                 // Unmaximize if maximized (safe to call even if not maximized)
                 let _ = window.unmaximize();
                 // Ensure it's not fullscreen
                 let _ = window.set_fullscreen(false);
+                
+                // Force window to 1600x1200
+                let _ = window.set_size(PhysicalSize::new(1600, 1200));
+                
+                // Center the window
+                let _ = window.center();
             }
             Ok(())
         })
