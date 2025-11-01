@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Square, Loader2 } from "lucide-react";
+import { RefreshCw, Loader2 } from "lucide-react";
 
 interface FooterButtonsProps {
   isSessionActive?: boolean;
   timeLeft?: number | null;
   isLoading?: boolean;
   onStartFocus?: () => void;
-  onStopFocus?: () => void;
   onStartNew?: () => void;
 }
 
@@ -21,7 +20,6 @@ export function FooterButtons({
   timeLeft = null,
   isLoading = false,
   onStartFocus,
-  onStopFocus,
   onStartNew,
 }: FooterButtonsProps) {
   return (
@@ -29,21 +27,15 @@ export function FooterButtons({
       <div className="flex items-center gap-3">
         <Button
           size="sm"
-          onClick={isSessionActive ? onStopFocus : onStartFocus}
+          onClick={onStartFocus}
           variant="ghost"
-          disabled={isLoading}
+          disabled={isLoading || isSessionActive}
           style={{ boxShadow: "none !important" }}
-          className={isSessionActive ? "text-red-400 hover:text-red-300" : ""}
         >
           {isLoading ? (
             <>
               <Loader2 className="size-4 animate-spin" />
-              <span>{isSessionActive ? "Stopping..." : "Starting..."}</span>
-            </>
-          ) : isSessionActive ? (
-            <>
-              <Square className="size-4" />
-              <span>Stop Focus Session</span>
+              <span>Starting...</span>
             </>
           ) : (
             <>
@@ -52,11 +44,6 @@ export function FooterButtons({
             </>
           )}
         </Button>
-        {isSessionActive && timeLeft !== null && !isLoading && (
-          <span className="text-xl font-mono text-white font-semibold">
-            {formatTime(timeLeft)}
-          </span>
-        )}
       </div>
 
       <Button size="sm" variant="ghost" onClick={onStartNew} disabled={isSessionActive}>

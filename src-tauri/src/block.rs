@@ -1,10 +1,90 @@
 use std::fs;
 use std::process::Command;
+use std::sync::Mutex;
+use std::time::{SystemTime, Duration};
 
 const HOSTS_FILE: &str = "/etc/hosts";
 const BLOCK_MARKER: &str = "# Focus app blocked sites";
+const SUDO_TIMEOUT_SECONDS: u64 = 900; // 15 minutes default sudo timeout
+
+// Global state to track last auth time
+static LAST_AUTH_TIME: Mutex<Option<SystemTime>> = Mutex::new(None);
+
+/// Extend sudo timestamp - prompts once and keeps it fresh for 15 minutes
+pub fn authorize_once() -> Result<(), String> {
+    // Try to extend existing sudo timestamp first (non-interactive)
+    let extend_result = Command::new("sudo")
+        .arg("-v")
+        .output();
+    
+    if extend_result.is_ok_and(|o| o.status.success()) {
+        // Successfully extended existing timestamp
+        let mut last_auth = LAST_AUTH_TIME.lock().unwrap();
+        *last_auth = Some(SystemTime::now());
+        return Ok(());
+    }
+    
+    // No existing timestamp, need to prompt
+    // Use pkexec for GUI prompt if available
+    if Command::new("which")
+        .arg("pkexec")
+        .output()
+        .is_ok_and(|o| o.status.success())
+    {
+        let result = Command::new("pkexec")
+            .arg("sudo")
+            .arg("-v")
+            .output();
+        
+        if result.is_ok_and(|o| o.status.success()) {
+            let mut last_auth = LAST_AUTH_TIME.lock().unwrap();
+            *last_auth = Some(SystemTime::now());
+            return Ok(());
+        } else {
+            return Err("Authentication failed. Please enter your password.".to_string());
+        }
+    }
+    
+    // Fallback to regular sudo prompt
+    let result = Command::new("sudo")
+        .arg("-v")
+        .output();
+    
+    if result.is_ok_and(|o| o.status.success()) {
+        let mut last_auth = LAST_AUTH_TIME.lock().unwrap();
+        *last_auth = Some(SystemTime::now());
+        Ok(())
+    } else {
+        Err("Authentication failed. Please enter your password.".to_string())
+    }
+}
+
+/// Refresh sudo timestamp if needed (non-interactive, fails silently if expired)
+fn refresh_sudo_if_needed() {
+    let should_refresh = {
+        let last_auth = LAST_AUTH_TIME.lock().unwrap();
+        match *last_auth {
+            Some(time) => {
+                time.elapsed().unwrap_or(Duration::from_secs(SUDO_TIMEOUT_SECONDS + 1))
+                    >= Duration::from_secs(SUDO_TIMEOUT_SECONDS - 60) // Refresh 1 min before expiry
+            }
+            None => true,
+        }
+    };
+    
+    if should_refresh {
+        // Try to extend non-interactively
+        let _ = Command::new("sudo")
+            .arg("-v")
+            .output();
+    }
+}
 
 fn check_sudo_auth() -> bool {
+    // First try to refresh if needed
+    refresh_sudo_if_needed();
+    
+    // Check if we have valid auth
     Command::new("sudo")
         .arg("-n")
         .arg("true")
@@ -235,41 +315,29 @@ pub fn block_sites(sites: &[String]) -> Result<(), String> {
             ),
             Err(e) => println!("⚠ Could not restart systemd-resolved: {}", e),
         }
-    } else if Command::new("which")
-        .arg("pkexec")
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
-        let restart_output = Command::new("pkexec")
-            .arg("systemctl")
-            .arg("restart")
-            .arg("systemd-resolved")
-            .output();
-        match restart_output {
-            Ok(o) if o.status.success() => println!("✓ systemd-resolved restarted successfully"),
-            Ok(o) => println!(
-                "⚠ systemd-resolved restart failed: {}",
-                String::from_utf8_lossy(&o.stderr)
-            ),
-            Err(e) => println!("⚠ Could not restart systemd-resolved: {}", e),
-        }
+    } else {
+        // Don't prompt again - log that restart failed due to expired auth
+        println!("⚠ Skipping systemd-resolved restart - sudo authorization expired. Please grant permission again.");
     }
 
+    // DNS flush commands - try without sudo first, then with cached sudo
     let flush_commands = vec![
         ("resolvectl", vec!["flush-caches"]),
         ("systemd-resolve", vec!["--flush-caches"]),
     ];
 
     for (cmd, args) in flush_commands {
+        // Try without sudo first (some systems allow this)
+        let no_sudo_result = Command::new(cmd).args(&args).output();
+        if no_sudo_result.is_ok_and(|o| o.status.success()) {
+            continue; // Success without sudo
+        }
+        
+        // If that fails, use cached sudo auth
         if check_sudo_auth() {
             let _ = Command::new("sudo").arg("-n").arg(cmd).args(args).output();
-        } else if Command::new("which")
-            .arg("pkexec")
-            .output()
-            .is_ok_and(|o| o.status.success())
-        {
-            let _ = Command::new("pkexec").arg(cmd).args(args).output();
         }
+        // Don't fall back to pkexec here - if sudo auth expired, user should re-authorize
     }
 
     if check_sudo_auth() {
@@ -384,62 +452,32 @@ pub fn unblock_sites() -> Result<(), String> {
             ),
             Err(e) => println!("⚠ Could not restart systemd-resolved: {}", e),
         }
-    } else if Command::new("which")
-        .arg("pkexec")
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
-        let restart_output = Command::new("pkexec")
-            .arg("sudo")
-            .arg("systemctl")
-            .arg("restart")
-            .arg("systemd-resolved")
-            .output();
-        match restart_output {
-            Ok(o) if o.status.success() => println!("✓ systemd-resolved restarted successfully"),
-            Ok(o) => println!(
-                "⚠ systemd-resolved restart failed: {}",
-                String::from_utf8_lossy(&o.stderr)
-            ),
-            Err(e) => println!("⚠ Could not restart systemd-resolved: {}", e),
-        }
+    } else {
+        println!("⚠ Skipping systemd-resolved restart - sudo authorization expired. Please grant permission again.");
     }
 
+    // DNS flush commands - try without sudo first, then with cached sudo
     let flush_commands = vec![
         ("resolvectl", vec!["flush-caches"]),
         ("systemd-resolve", vec!["--flush-caches"]),
     ];
 
     for (cmd, args) in flush_commands {
+        // Try without sudo first (some systems allow this)
+        let no_sudo_result = Command::new(cmd).args(&args).output();
+        if no_sudo_result.is_ok_and(|o| o.status.success()) {
+            continue; // Success without sudo
+        }
+        
+        // If that fails, use cached sudo auth
         if check_sudo_auth() {
             let _ = Command::new("sudo").arg("-n").arg(cmd).args(args).output();
-        } else if Command::new("which")
-            .arg("pkexec")
-            .output()
-            .is_ok_and(|o| o.status.success())
-        {
-            let _ = Command::new("pkexec")
-                .arg("sudo")
-                .arg(cmd)
-                .args(args)
-                .output();
         }
     }
 
     if check_sudo_auth() {
         let _ = Command::new("sudo")
             .arg("-n")
-            .arg("systemctl")
-            .arg("restart")
-            .arg("nscd")
-            .output();
-    } else if Command::new("which")
-        .arg("pkexec")
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
-        let _ = Command::new("pkexec")
-            .arg("sudo")
             .arg("systemctl")
             .arg("restart")
             .arg("nscd")

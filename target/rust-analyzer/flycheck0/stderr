@@ -1,16 +1,313 @@
-   0.808308627s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: stale: changed "/home/dipxsy/Desktop/projects/focus/src-tauri/src/block.rs"
-   0.808326752s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:           (vs) "/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-ba1bcdd63af501f8/dep-lib-focus_lib"
-   0.808330501s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1761947040, nanos: 284544512 } < FileTime { seconds: 1761947049, nanos: 471662921 }
-   0.809664267s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: fingerprint dirty for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: false }/TargetInner { ..: lib_target("focus_lib", ["staticlib", "cdylib", "rlib"], "/home/dipxsy/Desktop/projects/focus/src-tauri/src/lib.rs", Edition2021) }
-   0.809696546s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-ba1bcdd63af501f8/dep-lib-focus_lib", reference_mtime: FileTime { seconds: 1761947040, nanos: 284544512 }, stale: "/home/dipxsy/Desktop/projects/focus/src-tauri/src/block.rs", stale_mtime: FileTime { seconds: 1761947049, nanos: 471662921 } }))
-   0.959856177s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: stale: changed "/home/dipxsy/Desktop/projects/focus/src-tauri/src/block.rs"
-   0.959866873s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:           (vs) "/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-93386d04327b1c09/dep-test-lib-focus_lib"
-   0.959869202s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1761947040, nanos: 284544512 } < FileTime { seconds: 1761947049, nanos: 471662921 }
-   0.960090483s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: fingerprint dirty for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: true }/TargetInner { ..: lib_target("focus_lib", ["staticlib", "cdylib", "rlib"], "/home/dipxsy/Desktop/projects/focus/src-tauri/src/lib.rs", Edition2021) }
-   0.960101944s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-93386d04327b1c09/dep-test-lib-focus_lib", reference_mtime: FileTime { seconds: 1761947040, nanos: 284544512 }, stale: "/home/dipxsy/Desktop/projects/focus/src-tauri/src/block.rs", stale_mtime: FileTime { seconds: 1761947049, nanos: 471662921 } }))
-   0.961779249s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint: fingerprint dirty for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: false }/TargetInner { name: "focus", doc: true, ..: with_path("/home/dipxsy/Desktop/projects/focus/src-tauri/src/main.rs", Edition2021) }
-   0.961789100s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "focus_lib" })
-   0.963285923s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint: fingerprint dirty for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: true }/TargetInner { name: "focus", doc: true, ..: with_path("/home/dipxsy/Desktop/projects/focus/src-tauri/src/main.rs", Edition2021) }
-   0.963295559s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "focus_lib" })
+    Blocking waiting for file lock on build directory
+  15.487635728s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: fingerprint error for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: false }/TargetInner { ..: lib_target("focus_lib", ["staticlib", "cdylib", "rlib"], "/home/dipxsy/Desktop/projects/focus/src-tauri/src/lib.rs", Edition2021) }
+  15.487666815s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-14e51c3d70ea5e1e/lib-focus_lib`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::main
+  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  13: std::rt::lang_start::<()>::{closure#0}
+  14: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  15: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  16: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  17: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  18: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  19: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  20: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  21: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  22: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: <unknown>
+  15.520776930s  INFO prepare_target{force=false package_id=tauri v2.9.2 target="tauri"}: cargo::core::compiler::fingerprint: fingerprint error for tauri v2.9.2/Check { test: false }/TargetInner { ..: lib_target("tauri", ["lib"], "/home/dipxsy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.9.2/src/lib.rs", Edition2021) }
+  15.520821252s  INFO prepare_target{force=false package_id=tauri v2.9.2 target="tauri"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/tauri-ffb29161ec6b9f4d/lib-tauri`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  16: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  17: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  18: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  19: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  20: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  21: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  22: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  23: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  24: main
+  25: <unknown>
+  26: __libc_start_main
+  27: <unknown>
+  15.528465607s  INFO prepare_target{force=false package_id=tauri-runtime-wry v2.9.1 target="tauri_runtime_wry"}: cargo::core::compiler::fingerprint: fingerprint error for tauri-runtime-wry v2.9.1/Check { test: false }/TargetInner { ..: lib_target("tauri_runtime_wry", ["lib"], "/home/dipxsy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-runtime-wry-2.9.1/src/lib.rs", Edition2021) }
+  15.528491998s  INFO prepare_target{force=false package_id=tauri-runtime-wry v2.9.1 target="tauri_runtime_wry"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/tauri-runtime-wry-8643e14dbbf6a4c6/lib-tauri_runtime_wry`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  17: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  18: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  19: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  20: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  21: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  22: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  23: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  24: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  25: main
+  26: <unknown>
+  27: __libc_start_main
+  28: <unknown>
+  15.531708509s  INFO prepare_target{force=false package_id=tauri-plugin-opener v2.5.2 target="tauri_plugin_opener"}: cargo::core::compiler::fingerprint: fingerprint error for tauri-plugin-opener v2.5.2/Check { test: false }/TargetInner { ..: lib_target("tauri_plugin_opener", ["lib"], "/home/dipxsy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-plugin-opener-2.5.2/src/lib.rs", Edition2021) }
+  15.531777546s  INFO prepare_target{force=false package_id=tauri-plugin-opener v2.5.2 target="tauri_plugin_opener"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/tauri-plugin-opener-c33ddc9d974886ca/lib-tauri_plugin_opener`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  16: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  17: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  18: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  19: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  20: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  21: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  22: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  23: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  24: main
+  25: <unknown>
+  26: __libc_start_main
+  27: <unknown>
+  15.538641869s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint: fingerprint error for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: true }/TargetInner { ..: lib_target("focus_lib", ["staticlib", "cdylib", "rlib"], "/home/dipxsy/Desktop/projects/focus/src-tauri/src/lib.rs", Edition2021) }
+  15.538721473s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus_lib"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-f44f144ecdaa3bb4/test-lib-focus_lib`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::main
+  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  13: std::rt::lang_start::<()>::{closure#0}
+  14: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  15: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  16: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  17: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  18: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  19: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  20: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  21: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  22: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: <unknown>
+  15.543031985s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint: fingerprint error for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: false }/TargetInner { name: "focus", doc: true, ..: with_path("/home/dipxsy/Desktop/projects/focus/src-tauri/src/main.rs", Edition2021) }
+  15.543109393s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-54d9604d88c59d7b/bin-focus`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::main
+  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  13: std::rt::lang_start::<()>::{closure#0}
+  14: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  15: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  16: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  17: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  18: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  19: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  20: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  21: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  22: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: <unknown>
+  15.546825860s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint: fingerprint error for focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)/Check { test: true }/TargetInner { name: "focus", doc: true, ..: with_path("/home/dipxsy/Desktop/projects/focus/src-tauri/src/main.rs", Edition2021) }
+  15.546847494s  INFO prepare_target{force=false package_id=focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri) target="focus"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/dipxsy/Desktop/projects/focus/src-tauri/target/debug/.fingerprint/focus-d9f9af0787c7d6b3/test-bin-focus`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: cargo_util::paths::read_bytes
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   3: cargo::core::compiler::fingerprint::prepare_target
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::main
+  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  13: std::rt::lang_start::<()>::{closure#0}
+  14: core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/core/src/ops/function.rs:284:21
+  15: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  16: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  17: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  18: std::rt::lang_start_internal::{{closure}}
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:175:24
+  19: std::panicking::catch_unwind::do_call
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:589:40
+  20: std::panicking::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panicking.rs:552:19
+  21: std::panic::catch_unwind
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/panic.rs:359:14
+  22: std::rt::lang_start_internal
+             at /rustc/29483883eed69d5fb4db01964cdf2af4d86e9cb2/library/std/src/rt.rs:171:5
+  23: main
+  24: <unknown>
+  25: __libc_start_main
+  26: <unknown>
+    Checking tauri-runtime-wry v2.9.1
+    Checking tauri v2.9.2
+    Checking tauri-plugin-opener v2.5.2
     Checking focus v0.1.0 (/home/dipxsy/Desktop/projects/focus/src-tauri)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.72s
+error: could not compile `focus` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `focus` (lib test) due to 4 previous errors

@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { BackButton } from "@/components/BackButton";
@@ -7,7 +8,9 @@ import { DurationSelect } from "@/components/DurationSelect";
 import { BlockTags } from "@/components/BlockTags";
 import { FooterButtons } from "@/components/FooterButtons";
 import { PermissionDialog } from "@/components/PermissionDialog";
+import { WidgetPage } from "@/pages/WidgetPage";
 import { usePermissionStore } from "@/store/permissionStore";
+import { useSessionStore } from "@/store/sessionStore";
 
 interface Tag {
   id: string;
@@ -15,9 +18,8 @@ interface Tag {
 }
 
 function parseDuration(duration: string): number {
-  // Parse duration string to seconds
   const match = duration.match(/(\d+)\s*(minute|hour|minutes|hours)/i);
-  if (!match) return 3600; // Default to 1 hour
+  if (!match) return 3600; 
 
   const value = parseInt(match[1], 10);
   const unit = match[2].toLowerCase();
@@ -31,17 +33,26 @@ function parseDuration(duration: string): number {
   return 3600; // Default to 1 hour
 }
 
-export default function App() {
+function MainPage() {
+  const navigate = useNavigate();
   const [goal, setGoal] = useState("");
   const [duration, setDuration] = useState("1 hour");
   const [tags, setTags] = useState<Tag[]>([]);
   const [nextId, setNextId] = useState(1);
-  const [isSessionActive, setIsSessionActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { hasPermission, permissionAsked, setHasPermission, setPermissionAsked } = usePermissionStore();
+  const { setSession } = useSessionStore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      invoke<string>("resize_window_to_main").catch((error) => {
+        console.error("Failed to resize window on main page mount:", error);
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleRemoveTag = (id: string) => {
     setTags(tags.filter((tag) => tag.id !== id));
@@ -80,7 +91,7 @@ export default function App() {
       const durationSeconds = parseDuration(duration);
       const blockedSites = tags.map((tag) => tag.label);
       const sitesToBlock = hasPermission ? blockedSites : [];
-      
+
       const result = await invoke<string>("create_and_store_session", {
         goal: goal.trim(),
         duration: durationSeconds,
@@ -88,82 +99,20 @@ export default function App() {
       });
 
       console.log("Focus session started successfully!", result);
-      setIsSessionActive(true);
-      setTimeLeft(durationSeconds);
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-      timerIntervalRef.current = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime === null || prevTime <= 1) {
-            if (timerIntervalRef.current) {
-              clearInterval(timerIntervalRef.current);
-              timerIntervalRef.current = null;
-            }
-            setIsSessionActive(false);
-            invoke<string>("unblock_all_sites")
-              .then(() => {
-                console.log("Session ended automatically. Sites unblocked.");
-              })
-              .catch((error) => {
-                console.error("Failed to unblock sites automatically:", error);
-              });
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-
-      alert(`Focus session started!\n\nIMPORTANT: Please restart your browser for site blocking to take effect.\n\nBrowsers cache DNS aggressively, so a restart is required after blocking sites.`);
+      setSession(goal.trim(), durationSeconds);
+      navigate("/widget");
     } catch (error) {
       console.error("Failed to start focus session:", error);
       alert(`Failed to start focus session: ${error}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleStopFocus = async () => {
-    setIsLoading(true);
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
-    }
-
-    try {
-      const result = await invoke<string>("unblock_all_sites");
-      console.log("Sites unblocked successfully!", result);
-      setIsSessionActive(false);
-      setTimeLeft(null);
-      alert("Focus session stopped. Sites have been unblocked.");
-    } catch (error) {
-      console.error("Failed to stop focus session:", error);
-      alert(`Failed to stop focus session: ${error}`);
-      // Still reset state even if unblocking failed
-      setIsSessionActive(false);
-      setTimeLeft(null);
-    } finally {
       setIsLoading(false);
     }
   };
 
   const handleStartNew = () => {
-    if (isSessionActive) {
-      alert("Please stop the current session before starting a new one.");
-      return;
-    }
     setGoal("");
     setDuration("1 hour");
     setTags([]);
-    setTimeLeft(null);
   };
-  useEffect(() => {
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="min-h-screen w-full flex flex-col relative overflow-hidden">
@@ -173,7 +122,7 @@ export default function App() {
           onDeny={handleDenyPermission}
         />
       )}
-      
+
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-2xl"
         style={{
@@ -198,15 +147,23 @@ export default function App() {
         </div>
         <div className="mt-auto pt-4 border-white/10">
           <FooterButtons
-            isSessionActive={isSessionActive}
-            timeLeft={timeLeft}
+            isSessionActive={false}
+            timeLeft={null}
             isLoading={isLoading}
             onStartFocus={handleStartFocus}
-            onStopFocus={handleStopFocus}
             onStartNew={handleStartNew}
           />
         </div>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/widget" element={<WidgetPage />} />
+    </Routes>
   );
 }
