@@ -14,6 +14,14 @@ pub struct Store {
     blocked_things: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Session {
+    goal: String,
+    duration: u64,
+    blocked_things: Vec<String>,
+    timestamp: i64,
+}
+
 type Result<T> = std::result::Result<T, String>;
 const STORAGE_DIR: &str = "/home/dipxsy/.focus_sessions";
 
@@ -70,10 +78,59 @@ pub fn unblock_all_sites() -> Result<String> {
     Ok("Sites unblocked successfully".to_string())
 }
 
+#[tauri::command]
+pub fn get_all_sessions() -> Result<Vec<Session>> {
+    let dir = Path::new(STORAGE_DIR);
+    
+    if !dir.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut sessions = Vec::new();
+
+    let entries = fs::read_dir(dir)
+        .map_err(|e| format!("Failed to read directory: {}", e))?;
+
+    for entry in entries {
+        let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+        let path = entry.path();
+
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
+            if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                // Extract timestamp from filename: session_1762021023.json
+                if let Some(timestamp_str) = file_name.strip_prefix("session_").and_then(|s| s.strip_suffix(".json")) {
+                    if let Ok(timestamp) = timestamp_str.parse::<i64>() {
+                        let content = fs::read_to_string(&path)
+                            .map_err(|e| format!("Failed to read file {}: {}", path.display(), e))?;
+                        
+                        let store: Store = serde_json::from_str(&content)
+                            .map_err(|e| format!("Failed to parse JSON in {}: {}", path.display(), e))?;
+
+                        sessions.push(Session {
+                            goal: store.goal,
+                            duration: store.duration,
+                            blocked_things: store.blocked_things,
+                            timestamp,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort by timestamp descending (newest first)
+    sessions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+    Ok(sessions)
+}
+
 const MAIN_WINDOW_WIDTH: u32 = 900;
 const MAIN_WINDOW_HEIGHT: u32 = 600;
 const MAIN_WINDOW_MIN_WIDTH: u32 = 400;
 const MAIN_WINDOW_MIN_HEIGHT: u32 = 300;
+
+const STATS_WINDOW_WIDTH: u32 = 1600;
+const STATS_WINDOW_HEIGHT: u32 = 1200;
 
 const WIDGET_WINDOW_WIDTH: u32 = 400;
 const WIDGET_WINDOW_HEIGHT: u32 = 80;
@@ -118,16 +175,21 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
         .get_webview_window("main")
         .ok_or("Main window not found")?;
 
-    let _ = window.unmaximize();
+    // Ensure window is not maximized or fullscreen first
     let _ = window.set_fullscreen(false);
-
+    let _ = window.unmaximize();
     let _ = window.set_always_on_top(false);
 
+    // Ensure window is visible and focused
+    let _ = window.show();
+    let _ = window.set_focus();
+
+    // First, ensure window is resizable
     window
         .set_resizable(true)
         .map_err(|e| format!("Failed to set window resizable: {}", e))?;
 
-    // Clear all size constraints first
+    // Step 1: Clear ALL constraints first to remove stats/widget mode restrictions
     window
         .set_max_size(None::<PhysicalSize<u32>>)
         .map_err(|e| format!("Failed to remove max size: {}", e))?;
@@ -136,12 +198,27 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
         .set_min_size(None::<PhysicalSize<u32>>)
         .map_err(|e| format!("Failed to clear min size: {}", e))?;
 
-    // Set the window size to main dimensions
+    // Small delay to ensure constraints are cleared
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    // Step 2: Set both min and max to 900x600 to lock the window at that size
+    window
+        .set_min_size(Some(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)))
+        .map_err(|e| format!("Failed to set min size: {}", e))?;
+
+    window
+        .set_max_size(Some(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)))
+        .map_err(|e| format!("Failed to set max size: {}", e))?;
+
+    // Step 3: Set the window size to main dimensions
     window
         .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
         .map_err(|e| format!("Failed to set window size: {}", e))?;
 
-      let _ = window.center();
+    // Small delay to ensure size is applied
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    let _ = window.center();
 
     let current_size = window
         .inner_size()
@@ -153,6 +230,65 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
 
     Ok(format!(
         "Window resized to main size: {}x{}",
+        current_size.width, current_size.height
+    ))
+}
+
+#[tauri::command]
+pub async fn resize_window_to_stats(app: AppHandle) -> Result<String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Main window not found")?;
+
+    // Ensure window is not maximized or fullscreen first
+    let _ = window.set_fullscreen(false);
+    let _ = window.unmaximize();
+    let _ = window.set_always_on_top(false);
+
+    // Ensure window is visible and focused
+    let _ = window.show();
+    let _ = window.set_focus();
+
+    // First, ensure window is resizable
+    window
+        .set_resizable(true)
+        .map_err(|e| format!("Failed to set window resizable: {}", e))?;
+
+    // Step 1: Clear ALL constraints first
+    window
+        .set_max_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to remove max size: {}", e))?;
+
+    window
+        .set_min_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to clear min size: {}", e))?;
+
+    // Step 2: Set both min and max to stats dimensions to lock the window
+    window
+        .set_min_size(Some(PhysicalSize::new(STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT)))
+        .map_err(|e| format!("Failed to set min size: {}", e))?;
+
+    window
+        .set_max_size(Some(PhysicalSize::new(STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT)))
+        .map_err(|e| format!("Failed to set max size: {}", e))?;
+
+    // Step 3: Set the window size to stats dimensions
+    window
+        .set_size(PhysicalSize::new(STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT))
+        .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+    let _ = window.center();
+
+    let current_size = window
+        .inner_size()
+        .map_err(|e| format!("Failed to get current size: {}", e))?;
+    println!(
+        "Window resized to stats size: {}x{} (requested: {}x{})",
+        current_size.width, current_size.height, STATS_WINDOW_WIDTH, STATS_WINDOW_HEIGHT
+    );
+
+    Ok(format!(
+        "Window resized to stats size: {}x{}",
         current_size.width, current_size.height
     ))
 }

@@ -6,7 +6,7 @@ interface FooterButtonsProps {
   timeLeft?: number | null;
   isLoading?: boolean;
   onStartFocus?: () => void;
-  onStartNew?: () => void;
+  onViewStats?: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -20,7 +20,7 @@ export function FooterButtons({
   timeLeft = null,
   isLoading = false,
   onStartFocus,
-  onStartNew,
+  onViewStats,
 }: FooterButtonsProps) {
   return (
     <div className="flex items-center justify-between gap-2 w-full border-t pt-4">
@@ -46,17 +46,8 @@ export function FooterButtons({
         </Button>
       </div>
 
-      <Button size="sm" variant="ghost" onClick={onStartNew} disabled={isSessionActive}>
-        <span>Start New Session</span>
-        <div className="flex items-center gap-1 ml-1">
-          <kbd className="px-1.5 py-0.5 bg-[#1a1a1a] border border-[#3a3a3a] rounded text-[10px] font-mono text-gray-400">
-            ⌘
-          </kbd>
-          <span className="text-gray-400 text-xs">+</span>
-          <kbd className="px-1.5 py-0.5 bg-[#1a1a1a] border border-[#3a3a3a] rounded text-[10px] font-mono text-gray-400">
-            J
-          </kbd>
-        </div>
+      <Button size="sm" variant="ghost" onClick={onViewStats} disabled={isSessionActive}>
+        <span>View Stats</span>
       </Button>
     </div>
   );

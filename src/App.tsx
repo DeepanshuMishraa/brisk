@@ -9,6 +9,7 @@ import { BlockTags } from "@/components/BlockTags";
 import { FooterButtons } from "@/components/FooterButtons";
 import { PermissionDialog } from "@/components/PermissionDialog";
 import { WidgetPage } from "@/pages/WidgetPage";
+import { StatsPage } from "@/pages/StatsPage";
 import { usePermissionStore } from "@/store/permissionStore";
 import { useSessionStore } from "@/store/sessionStore";
 
@@ -43,16 +44,6 @@ function MainPage() {
 
   const { hasPermission, permissionAsked, setHasPermission, setPermissionAsked } = usePermissionStore();
   const { setSession } = useSessionStore();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      invoke<string>("resize_window_to_main").catch((error) => {
-        console.error("Failed to resize window on main page mount:", error);
-      });
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleRemoveTag = (id: string) => {
     setTags(tags.filter((tag) => tag.id !== id));
@@ -114,6 +105,17 @@ function MainPage() {
     setTags([]);
   };
 
+  const handleViewStats = async () => {
+    try {
+      await invoke<string>("resize_window_to_stats");
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      navigate("/stats");
+    } catch (error) {
+      console.error("Failed to resize window to stats:", error);
+      navigate("/stats");
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col relative overflow-hidden">
       {!permissionAsked && (
@@ -151,7 +153,7 @@ function MainPage() {
             timeLeft={null}
             isLoading={isLoading}
             onStartFocus={handleStartFocus}
-            onStartNew={handleStartNew}
+            onViewStats={handleViewStats}
           />
         </div>
       </div>
@@ -164,6 +166,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<MainPage />} />
       <Route path="/widget" element={<WidgetPage />} />
+      <Route path="/stats" element={<StatsPage />} />
     </Routes>
   );
 }

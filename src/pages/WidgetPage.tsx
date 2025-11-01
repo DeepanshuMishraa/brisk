@@ -6,7 +6,7 @@ import { FocusWidget } from "@/components/FocusWidget";
 
 export function WidgetPage() {
   const navigate = useNavigate();
-  const { goal, duration, timeLeft, updateTimeLeft, reset } = useSessionStore();
+  const { goal, duration, timeLeft, updateTimeLeft } = useSessionStore();
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isEndingRef = useRef(false);
 
@@ -27,45 +27,46 @@ export function WidgetPage() {
         timerIntervalRef.current = null;
       }
 
-      const resizeToMain = async () => {
-        console.log("Resizing window to main size...");
+      const resizeToStats = async () => {
+        console.log("Resizing window to stats size...");
 
         try {
-          const result = await invoke<string>("resize_window_to_main");
-          console.log("Resize to main result:", result);
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          const result = await invoke<string>("resize_window_to_stats");
+          console.log("Resize to stats result:", result);
+          // Wait longer to ensure resize completes
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (error) {
-          console.error("Failed to resize to main:", error);
+          console.error("Failed to resize to stats:", error);
         }
       };
 
-      resizeToMain()
+      resizeToStats()
         .then(() => {
           console.log("Unblocking sites...");
           return invoke<string>("unblock_all_sites");
         })
         .then(() => {
-          console.log("Resetting session and navigating...");
-          reset();
-          navigate("/", { replace: true });
+          console.log("Navigating to stats page...");
+          // Add another small delay before navigation to ensure window is resized
           setTimeout(() => {
-            invoke<string>("resize_window_to_main").catch((error) => {
-              console.error("Failed to resize after navigation:", error);
-            });
-          }, 200);
+            navigate("/stats", { replace: true });
+          }, 300);
         })
         .catch((error) => {
           console.error("Error in session end sequence:", error);
-          reset();
-          navigate("/", { replace: true });
-          setTimeout(() => {
-            invoke<string>("resize_window_to_main").catch((e) => {
-              console.error("Failed to resize on error:", e);
+          // Still try to resize and navigate even on error
+          invoke<string>("resize_window_to_stats")
+            .then(() => {
+              setTimeout(() => {
+                navigate("/stats", { replace: true });
+              }, 1000);
+            })
+            .catch(() => {
+              navigate("/stats", { replace: true });
             });
-          }, 200);
         });
     }
-  }, [timeLeft, duration, reset, navigate]);
+  }, [timeLeft, duration, navigate]);
 
   useEffect(() => {
     if (duration > 0 && timeLeft > 0) {

@@ -20,8 +20,10 @@ pub fn run() {
             commands::authorize_admin,
             commands::create_and_store_session,
             commands::unblock_all_sites,
+            commands::get_all_sessions,
             commands::resize_window_to_widget,
-            commands::resize_window_to_main
+            commands::resize_window_to_main,
+            commands::resize_window_to_stats
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
