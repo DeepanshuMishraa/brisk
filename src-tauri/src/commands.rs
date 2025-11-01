@@ -124,19 +124,24 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
     let _ = window.set_always_on_top(false);
 
     window
+        .set_resizable(true)
+        .map_err(|e| format!("Failed to set window resizable: {}", e))?;
+
+    // Clear all size constraints first
+    window
         .set_max_size(None::<PhysicalSize<u32>>)
         .map_err(|e| format!("Failed to remove max size: {}", e))?;
 
     window
-        .set_min_size(Some(PhysicalSize::new(
-            MAIN_WINDOW_MIN_WIDTH,
-            MAIN_WINDOW_MIN_HEIGHT,
-        )))
-        .map_err(|e| format!("Failed to set min size: {}", e))?;
+        .set_min_size(None::<PhysicalSize<u32>>)
+        .map_err(|e| format!("Failed to clear min size: {}", e))?;
 
+    // Set the window size to main dimensions
     window
         .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
         .map_err(|e| format!("Failed to set window size: {}", e))?;
+
+      let _ = window.center();
 
     let current_size = window
         .inner_size()
