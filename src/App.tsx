@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { AnimatePresence, motion } from "motion/react";
 import "./App.css";
-import { BackButton } from "@/components/BackButton";
 import { GoalInput } from "@/components/GoalInput";
 import { DurationSelect } from "@/components/DurationSelect";
 import { BlockTags } from "@/components/BlockTags";
@@ -166,7 +165,7 @@ function MainPage() {
             onAddTag={handleAddTag}
           />
         </div>
-        <div className="mt-auto pt-4 border-gray-200/30 dark:border-white/10">
+        <div className="mt-auto pt-6">
           <FooterButtons
             isSessionActive={false}
             timeLeft={null}
