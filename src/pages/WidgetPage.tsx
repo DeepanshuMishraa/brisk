@@ -10,6 +10,29 @@ export function WidgetPage() {
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isEndingRef = useRef(false);
 
+  const playFinishSound = async () => {
+    return new Promise<void>((resolve, reject) => {
+      const audio = new Audio();
+      audio.volume = 1.0;
+      
+      audio.addEventListener('ended', () => {
+        resolve();
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error("Audio error:", e);
+        reject(e);
+      });
+      
+      audio.src = '/finish.mp3';
+      
+      audio.play().catch(err => {
+        console.error("Play failed:", err);
+        reject(err);
+      });
+    });
+  };
+
   useEffect(() => {
     invoke<string>("resize_window_to_widget").catch((error) => {
       console.error("Failed to resize window:", error);
@@ -29,15 +52,16 @@ export function WidgetPage() {
 
       const handleSessionEnd = async () => {
         try {
-          console.log("Navigating to stats page first...");
+          playFinishSound().catch(err => console.error("Sound error:", err));
+          
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          
           navigate("/stats", { replace: true });
           
           await new Promise((resolve) => setTimeout(resolve, 100));
           
-          console.log("Resizing window to stats size...");
           await invoke<string>("resize_window_to_stats");
           
-          console.log("Unblocking sites...");
           await invoke<string>("unblock_all_sites");
         } catch (error) {
           console.error("Error in session end sequence:", error);
