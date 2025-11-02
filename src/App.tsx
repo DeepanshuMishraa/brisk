@@ -13,6 +13,8 @@ import { WidgetPage } from "@/pages/WidgetPage";
 import { StatsPage } from "@/pages/StatsPage";
 import { usePermissionStore } from "@/store/permissionStore";
 import { useSessionStore } from "@/store/sessionStore";
+import { ThemeProvider } from "./components/theme-provider";
+import { ModeToggle } from "./components/mode-toggle";
 
 interface Tag {
   id: string;
@@ -21,7 +23,7 @@ interface Tag {
 
 function parseDuration(duration: string): number {
   const match = duration.match(/(\d+)\s*(minute|hour|minutes|hours)/i);
-  if (!match) return 3600; 
+  if (!match) return 3600;
 
   const value = parseInt(match[1], 10);
   const unit = match[2].toLowerCase();
@@ -43,7 +45,12 @@ function MainPage() {
   const [nextId, setNextId] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { hasPermission, permissionAsked, setHasPermission, setPermissionAsked } = usePermissionStore();
+  const {
+    hasPermission,
+    permissionAsked,
+    setHasPermission,
+    setPermissionAsked,
+  } = usePermissionStore();
   const { setSession } = useSessionStore();
 
   const handleRemoveTag = (id: string) => {
@@ -75,7 +82,9 @@ function MainPage() {
     }
 
     if (!hasPermission && permissionAsked) {
-      alert("Please grant permission to block sites. You can start a session without blocking, but sites won't be blocked.");
+      alert(
+        "Please grant permission to block sites. You can start a session without blocking, but sites won't be blocked.",
+      );
     }
 
     setIsLoading(true);
@@ -100,12 +109,6 @@ function MainPage() {
     }
   };
 
-  const handleStartNew = () => {
-    setGoal("");
-    setDuration("1 hour");
-    setTags([]);
-  };
-
   const handleViewStats = async () => {
     try {
       await invoke<string>("resize_window_to_stats");
@@ -127,7 +130,7 @@ function MainPage() {
       )}
 
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-2xl"
+        className="absolute inset-0 hidden dark:block backdrop-blur-2xl"
         style={{
           background: `
             radial-gradient(1200px 600px at 10% 0%, rgba(255,255,255,0.02), transparent 60%),
@@ -137,18 +140,33 @@ function MainPage() {
           `,
         }}
       />
-      <div className="absolute inset-0 border border-white/8 rounded-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] pointer-events-none" />
+      <div
+        className="absolute inset-0 block dark:hidden backdrop-blur-2xl"
+        style={{
+          background: `
+            radial-gradient(1200px 600px at 10% 0%, rgba(255,255,255,0.08), transparent 60%),
+            radial-gradient(800px 600px at 80% 40%, rgba(255,255,255,0.06), transparent 60%),
+            radial-gradient(600px 400px at 50% 120%, rgba(0,0,0,0.1), transparent 60%),
+            rgba(255, 255, 255, 0.85)
+          `,
+        }}
+      />
+      <div className="absolute inset-0 border border-gray-300/20 dark:border-white/8 rounded-none shadow-[inset_0_1px_0_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] pointer-events-none" />
 
       <div className="relative w-full max-w-3xl mx-auto flex flex-col h-screen px-6 py-6 z-10">
         <div className="flex items-start mb-6">
-          <BackButton onClick={() => console.log("Back clicked")} />
+          <ModeToggle />
         </div>
         <div className="space-y-6 px-2 flex-1">
           <GoalInput value={goal} onChange={setGoal} />
           <DurationSelect value={duration} onValueChange={setDuration} />
-          <BlockTags tags={tags} onRemoveTag={handleRemoveTag} onAddTag={handleAddTag} />
+          <BlockTags
+            tags={tags}
+            onRemoveTag={handleRemoveTag}
+            onAddTag={handleAddTag}
+          />
         </div>
-        <div className="mt-auto pt-4 border-white/10">
+        <div className="mt-auto pt-4 border-gray-200/30 dark:border-white/10">
           <FooterButtons
             isSessionActive={false}
             timeLeft={null}
@@ -164,44 +182,55 @@ function MainPage() {
 
 export default function App() {
   const location = useLocation();
-  
+
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="w-full h-full"
-          >
-            <MainPage />
-          </motion.div>
-        } />
-        <Route path="/widget" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="w-full h-full"
-          >
-            <WidgetPage />
-          </motion.div>
-        } />
-        <Route path="/stats" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="w-full h-full"
-          >
-            <StatsPage />
-          </motion.div>
-        } />
-      </Routes>
-    </AnimatePresence>
+    <ThemeProvider defaultTheme="dark" storageKey="brisk-ui-theme">
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="w-full h-full"
+              >
+                <MainPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/widget"
+            element={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="w-full h-full"
+              >
+                <WidgetPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="w-full h-full"
+              >
+                <StatsPage />
+              </motion.div>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+    </ThemeProvider>
   );
 }

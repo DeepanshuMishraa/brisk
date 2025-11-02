@@ -16,7 +16,7 @@ export function FooterButtons({
   onViewStats,
 }: FooterButtonsProps) {
   return (
-    <div className="flex items-center justify-between gap-2 w-full border-t pt-4">
+    <div className="flex items-center justify-between gap-2 w-full border-t border-gray-200/30 dark:border-white/10 pt-4">
       <div className="flex items-center gap-3">
         <Button
           size="sm"
@@ -33,7 +33,7 @@ export function FooterButtons({
           ) : (
             <>
               <RefreshCw className="size-4" />
-              <span>Start Focus Session</span>
+              <span className="font-geist">Start Focus Session</span>
             </>
           )}
         </Button>

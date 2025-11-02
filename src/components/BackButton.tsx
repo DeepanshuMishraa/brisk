@@ -9,7 +9,7 @@ export function BackButton({ onClick }: { onClick?: () => void }) {
       size="icon"
       onClick={onClick}
       className={cn(
-        "size-9 rounded-md bg-white/5 hover:bg-white/10 text-white border border-white/15 backdrop-blur-xl shadow-none",
+        "size-9 rounded-md bg-gray-100/50 dark:bg-white/5 hover:bg-gray-200/50 dark:hover:bg-white/10 text-gray-900 dark:text-white border border-gray-300/30 dark:border-white/15 backdrop-blur-xl shadow-none",
       )}
     >
       <ArrowLeft className="size-4" />

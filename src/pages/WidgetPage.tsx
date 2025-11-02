@@ -96,7 +96,7 @@ export function WidgetPage() {
   if (!goal || duration === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-transparent">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
       </div>
     );
   }

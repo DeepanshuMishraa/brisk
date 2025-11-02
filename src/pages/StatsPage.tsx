@@ -87,25 +87,25 @@ export function StatsPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#1A1A1A]">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-[#1A1A1A]">
       <div className="w-full max-w-5xl mx-auto flex flex-col h-screen">
-        <div className="flex items-center justify-between px-12 py-8 border-b border-white/10">
+        <div className="flex items-center justify-between px-12 py-8 border-b border-gray-200/30 dark:border-white/10">
           <div className="flex items-center gap-4">
             <Button
               onClick={handleStartNew}
               variant="outline"
               size="icon"
-              className="border-white/10 hover:bg-white/5"
+              className="border-gray-300/30 dark:border-white/10 hover:bg-gray-100/50 dark:hover:bg-white/5"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-2xl font-light tracking-tight text-white">
+            <h1 className="text-2xl font-semibold tracking-lighter text-gray-900 dark:text-white">
               Sessions
             </h1>
           </div>
           <button
             onClick={handleStartNew}
-            className="px-5 py-2 bg-white text-black text-sm font-medium hover:bg-gray-200 transition-colors rounded-md"
+            className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors rounded-md"
           >
             New Session
           </button>
@@ -113,11 +113,11 @@ export function StatsPage() {
         <div className="flex-1 overflow-y-auto px-12 py-8">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-500 text-sm font-light">Loading...</div>
+              <div className="text-gray-500 dark:text-gray-500 text-gray-400 text-sm font-light">Loading...</div>
             </div>
           ) : sessions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
-              <div className="text-gray-500 text-sm font-light">
+              <div className="text-gray-400 dark:text-gray-500 text-sm font-light">
                 No sessions yet
               </div>
             </div>
@@ -126,24 +126,24 @@ export function StatsPage() {
               {sessions.map((session) => (
                 <div
                   key={session.timestamp}
-                  className="group py-5 px-4 rounded-lg border border-white/5 hover:bg-white/5 transition-colors"
+                  className="group py-5 px-4 rounded-lg border border-gray-200/30 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-8">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-medium text-white mb-1 truncate">
+                      <h3 className="text-base font-medium text-white dark:text-white text-gray-900 mb-1 truncate">
                         {session.goal}
                       </h3>
-                      <div className="text-sm text-gray-400 font-light">
+                      <div className="text-sm text-gray-400 dark:text-gray-400 text-gray-500 font-light">
                         {formatDate(session.timestamp)}
                       </div>
                     </div>
                     <div className="flex items-center gap-6 shrink-0">
                       <div className="text-right">
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {formatTime(session.duration)}
                         </div>
                         {session.blocked_things.length > 0 && (
-                          <div className="text-xs text-gray-500 font-light mt-0.5">
+                          <div className="text-xs text-gray-500 dark:text-gray-500 text-gray-400 font-light mt-0.5">
                             {session.blocked_things.length}{" "}
                             {session.blocked_things.length === 1
                               ? "site"
@@ -155,12 +155,12 @@ export function StatsPage() {
                     </div>
                   </div>
                   {session.blocked_things.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-3 pt-3 border-t border-gray-200/30 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="flex flex-wrap gap-2">
                         {session.blocked_things.map((site, siteIndex) => (
                           <span
                             key={siteIndex}
-                            className="text-xs px-2 py-1 rounded bg-white/5 text-gray-400 font-light"
+                            className="text-xs px-2 py-1 rounded bg-gray-200/50 dark:bg-white/5 text-gray-600 dark:text-gray-400 font-light"
                           >
                             {site}
                           </span>
