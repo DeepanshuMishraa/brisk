@@ -113,7 +113,9 @@ export function StatsPage() {
         <div className="flex-1 overflow-y-auto px-12 py-8">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-500 dark:text-gray-500 text-gray-400 text-sm font-light">Loading...</div>
+              <div className=" dark:text-gray-500 text-gray-400 text-sm font-light">
+                Loading...
+              </div>
             </div>
           ) : sessions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
@@ -130,10 +132,10 @@ export function StatsPage() {
                 >
                   <div className="flex items-start justify-between gap-8">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-medium text-white dark:text-white text-gray-900 mb-1 truncate">
+                      <h3 className="text-base font-medium  dark:text-white text-gray-900 mb-1 truncate">
                         {session.goal}
                       </h3>
-                      <div className="text-sm text-gray-400 dark:text-gray-400 text-gray-500 font-light">
+                      <div className="text-sm  dark:text-gray-400 text-gray-500 font-light">
                         {formatDate(session.timestamp)}
                       </div>
                     </div>
@@ -143,7 +145,7 @@ export function StatsPage() {
                           {formatTime(session.duration)}
                         </div>
                         {session.blocked_things.length > 0 && (
-                          <div className="text-xs text-gray-500 dark:text-gray-500 text-gray-400 font-light mt-0.5">
+                          <div className="text-xs  dark:text-gray-500 text-gray-400 font-light mt-0.5">
                             {session.blocked_things.length}{" "}
                             {session.blocked_things.length === 1
                               ? "site"
