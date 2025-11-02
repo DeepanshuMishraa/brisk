@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Loader2 } from "lucide-react";
+import { Play, BarChart3, Loader2 } from "lucide-react";
 
 interface FooterButtonsProps {
   isSessionActive?: boolean;
@@ -16,36 +16,33 @@ export function FooterButtons({
   onViewStats,
 }: FooterButtonsProps) {
   return (
-    <div className="flex items-center justify-between gap-2 w-full border-t pt-4">
-      <div className="flex items-center gap-3">
-        <Button
-          size="sm"
-          onClick={onStartFocus}
-          variant="ghost"
-          disabled={isLoading || isSessionActive}
-          style={{ boxShadow: "none !important" }}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              <span>Starting...</span>
-            </>
-          ) : (
-            <>
-              <RefreshCw className="size-4" />
-              <span>Start Focus Session</span>
-            </>
-          )}
-        </Button>
-      </div>
+    <div className="flex items-center gap-3 w-full">
+      <Button
+        onClick={onStartFocus}
+        disabled={isLoading || isSessionActive}
+        className="flex-1 h-11 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="size-4 mr-2 animate-spin" />
+            <span>Starting...</span>
+          </>
+        ) : (
+          <>
+            <Play className="size-4 mr-2 fill-current" />
+            <span>Start Focus</span>
+          </>
+        )}
+      </Button>
 
       <Button
-        size="sm"
-        variant="ghost"
         onClick={onViewStats}
         disabled={isSessionActive}
+        variant="outline"
+        className="h-11 px-5 border-gray-300/50 dark:border-white/20 hover:bg-gray-100/50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <span>View Stats</span>
+        <BarChart3 className="size-4 mr-2" />
+        <span>Stats</span>
       </Button>
     </div>
   );

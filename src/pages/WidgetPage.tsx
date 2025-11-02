@@ -20,51 +20,32 @@ export function WidgetPage() {
     if (duration > 0 && timeLeft === 0 && !isEndingRef.current) {
       isEndingRef.current = true;
 
-      console.log("Session ended, resizing window and navigating...");
+      console.log("Session ended, navigating to stats...");
 
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
         timerIntervalRef.current = null;
       }
 
-      const resizeToStats = async () => {
-        console.log("Resizing window to stats size...");
-
+      const handleSessionEnd = async () => {
         try {
-          const result = await invoke<string>("resize_window_to_stats");
-          console.log("Resize to stats result:", result);
-          // Wait longer to ensure resize completes
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          console.log("Navigating to stats page first...");
+          navigate("/stats", { replace: true });
+          
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          
+          console.log("Resizing window to stats size...");
+          await invoke<string>("resize_window_to_stats");
+          
+          console.log("Unblocking sites...");
+          await invoke<string>("unblock_all_sites");
         } catch (error) {
-          console.error("Failed to resize to stats:", error);
+          console.error("Error in session end sequence:", error);
+          navigate("/stats", { replace: true });
         }
       };
 
-      resizeToStats()
-        .then(() => {
-          console.log("Unblocking sites...");
-          return invoke<string>("unblock_all_sites");
-        })
-        .then(() => {
-          console.log("Navigating to stats page...");
-          // Add another small delay before navigation to ensure window is resized
-          setTimeout(() => {
-            navigate("/stats", { replace: true });
-          }, 300);
-        })
-        .catch((error) => {
-          console.error("Error in session end sequence:", error);
-          // Still try to resize and navigate even on error
-          invoke<string>("resize_window_to_stats")
-            .then(() => {
-              setTimeout(() => {
-                navigate("/stats", { replace: true });
-              }, 1000);
-            })
-            .catch(() => {
-              navigate("/stats", { replace: true });
-            });
-        });
+      handleSessionEnd();
     }
   }, [timeLeft, duration, navigate]);
 
@@ -96,7 +77,7 @@ export function WidgetPage() {
   if (!goal || duration === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-transparent">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
       </div>
     );
   }

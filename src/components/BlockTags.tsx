@@ -107,18 +107,18 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
 
   return (
     <div className="flex items-start gap-4">
-      <label className="text-sm font-medium text-white w-20 shrink-0 pt-2">
+      <label className="text-sm font-medium text-gray-900 dark:text-white w-20 shrink-0 pt-2">
         Block
       </label>
       <div className="flex-1 relative">
-        <div className="bg-white/5 border border-white/15 backdrop-blur-xl rounded-md p-2 min-h-[60px] flex items-start gap-2 flex-wrap relative shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+        <div className="bg-gray-100/50 dark:bg-white/5 border border-gray-300/30 dark:border-white/15 backdrop-blur-xl rounded-md p-2 min-h-[60px] flex items-start gap-2 flex-wrap relative shadow-[inset_0_1px_0_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="flex items-center gap-2 flex-wrap flex-1">
             {tags.map((tag) => (
               <Badge
                 key={tag.id}
                 variant="secondary"
                 className={cn(
-                  "bg-white/5 border-white/15 text-white rounded-md px-2 py-1 backdrop-blur-xl",
+                  "bg-gray-200/50 dark:bg-white/5 border-gray-300/30 dark:border-white/15 text-gray-900 dark:text-white rounded-md px-2 py-1 backdrop-blur-xl",
                   "flex items-center gap-1.5 h-7 text-xs"
                 )}
               >
@@ -126,10 +126,10 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
                 <span>{tag.label}</span>
                 <button
                   onClick={() => onRemoveTag(tag.id)}
-                  className="ml-1 hover:bg-white/10 rounded-full p-0.5 transition-colors flex items-center justify-center"
+                  className="ml-1 hover:bg-gray-300/30 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors flex items-center justify-center"
                   aria-label={`Remove ${tag.label}`}
                 >
-                  <X className="size-3 text-white" />
+                  <X className="size-3 text-gray-900 dark:text-white" />
                 </button>
               </Badge>
             ))}
@@ -142,7 +142,7 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
               onBlur={handleInputBlur}
               placeholder="Type to search sites..."
               className={cn(
-                "border-0 bg-transparent text-white placeholder:text-white/30 h-7 px-2 py-1 text-xs",
+                "border-0 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/30 h-7 px-2 py-1 text-xs",
                 "focus-visible:ring-0 focus-visible:outline-none",
                 "flex-1 min-w-[120px]"
               )}
@@ -152,7 +152,7 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
             variant="ghost"
             size="icon"
             className={cn(
-              "size-5 rounded-full text-gray-300 hover:text-white shrink-0 absolute top-2 right-2 bg-white/5 border border-white/10"
+              "size-5 rounded-full text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white shrink-0 absolute top-2 right-2 bg-gray-200/50 dark:bg-white/5 border border-gray-300/30 dark:border-white/10"
             )}
             aria-label="Information"
           >
@@ -162,20 +162,20 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
         {showSuggestions && suggestions.length > 0 && (
           <div
             ref={suggestionsRef}
-            className="absolute z-50 w-full mt-1 bg-black/90 border border-white/15 backdrop-blur-xl rounded-md shadow-lg overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-black/90 border border-gray-300/30 dark:border-white/15 backdrop-blur-xl rounded-md shadow-lg overflow-hidden"
           >
             {suggestions.map((site, index) => (
               <button
                 key={`${site.name}-${index}`}
                 onClick={() => handleSelectSite(site)}
                 className={cn(
-                  "w-full text-left px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors",
+                  "w-full text-left px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors",
                   "flex items-center gap-2",
-                  index === selectedIndex && "bg-white/10"
+                  index === selectedIndex && "bg-gray-100 dark:bg-white/10"
                 )}
               >
                 <span className="font-medium">{site.name}</span>
-                <span className="text-xs text-white/50">({site.category})</span>
+                <span className="text-xs text-gray-500 dark:text-white/50">({site.category})</span>
               </button>
             ))}
           </div>
