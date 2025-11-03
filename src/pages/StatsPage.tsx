@@ -105,7 +105,7 @@ export function StatsPage() {
           </div>
           <button
             onClick={handleStartNew}
-            className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors rounded-md"
+            className="px-5 py-2  text-sm font-medium hover:bg-[#9ae600] bg-[#acfa02]  text-gray-800 transition-colors rounded-md active:scale-[0.98] duration-150"
           >
             New Session
           </button>

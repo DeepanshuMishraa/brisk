@@ -20,7 +20,7 @@ export function FooterButtons({
       <Button
         onClick={onStartFocus}
         disabled={isLoading || isSessionActive}
-        className="flex-1 h-11 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        className="flex-1 h-11 hover:bg-[#9ae600] bg-[#acfa02]  text-gray-800 font-medium transition-all  disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] duration-150"
       >
         {isLoading ? (
           <>
@@ -39,7 +39,7 @@ export function FooterButtons({
         onClick={onViewStats}
         disabled={isSessionActive}
         variant="outline"
-        className="h-11 px-5 border-gray-300/50 dark:border-white/20 hover:bg-gray-100/50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="h-11 px-5 border-gray-300/50 dark:border-white/20 hover:bg-gray-100/50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] duration-150"
       >
         <BarChart3 className="size-4 mr-2" />
         <span>Stats</span>
