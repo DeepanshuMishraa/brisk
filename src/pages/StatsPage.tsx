@@ -87,7 +87,7 @@ export function StatsPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-[#1A1A1A]">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50 dark:bg-[#0a0a0a]">
       <div className="w-full max-w-5xl mx-auto flex flex-col h-screen">
         <div className="flex items-center justify-between px-12 py-8 border-b border-gray-200/30 dark:border-white/10">
           <div className="flex items-center gap-4">
@@ -105,64 +105,67 @@ export function StatsPage() {
           </div>
           <button
             onClick={handleStartNew}
-            className="px-5 py-2  text-sm font-medium hover:bg-[#9ae600] bg-[#acfa02]  text-gray-800 transition-colors rounded-md active:scale-[0.98] duration-150"
+            className="px-5 py-2 text-sm font-medium hover:bg-[#9ae600] bg-[#acfa02] text-gray-800 transition-colors rounded-md active:scale-[0.98] duration-150"
           >
             New Session
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-12 py-8">
+        <div className="flex-1 overflow-y-auto px-12 py-6">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className=" dark:text-gray-500 text-gray-400 text-sm font-light">
+              <div className="text-gray-400 dark:text-gray-500 text-sm font-medium">
                 Loading...
               </div>
             </div>
           ) : sessions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
-              <div className="text-gray-400 dark:text-gray-500 text-sm font-light">
+              <div className="text-gray-400 dark:text-gray-500 text-sm font-medium">
                 No sessions yet
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
-              {sessions.map((session) => (
+            <div className="space-y-3">
+              {sessions.map((session, index) => (
                 <div
                   key={session.timestamp}
-                  className="group py-5 px-4 rounded-lg border border-gray-200/30 dark:border-white/5 hover:bg-gray-100/50 dark:hover:bg-white/5 transition-colors"
+                  className="group relative py-5 px-6 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white dark:bg-[#121212] hover:border-gray-300/80 dark:hover:border-white/[0.14] hover:shadow-[0_2px_16px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_2px_16px_rgba(0,0,0,0.3)] transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between gap-8">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-medium  dark:text-white text-gray-900 mb-1 truncate">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/[0.02] via-purple-500/[0.02] to-pink-500/[0.02] dark:from-blue-400/[0.03] dark:via-purple-400/[0.03] dark:to-pink-400/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  
+                  <div className="relative flex items-start justify-between gap-8">
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-50 truncate leading-tight">
                         {session.goal}
                       </h3>
-                      <div className="text-sm  dark:text-gray-400 text-gray-500 font-light">
+                      <div className="text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                         {formatDate(session.timestamp)}
                       </div>
                     </div>
+                    
                     <div className="flex items-center gap-6 shrink-0">
-                      <div className="text-right">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {formatTime(session.duration)}
+                      <div className="text-right space-y-1.5">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-br from-emerald-500/[0.08] to-teal-500/[0.08] dark:from-emerald-400/[0.12] dark:to-teal-400/[0.12] border border-emerald-500/20 dark:border-emerald-400/20">
+                          <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">
+                            {formatTime(session.duration)}
+                          </span>
                         </div>
                         {session.blocked_things.length > 0 && (
-                          <div className="text-xs  dark:text-gray-500 text-gray-400 font-light mt-0.5">
+                          <div className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
                             {session.blocked_things.length}{" "}
-                            {session.blocked_things.length === 1
-                              ? "site"
-                              : "sites"}{" "}
-                            blocked
+                            {session.blocked_things.length === 1 ? "site" : "sites"} blocked
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
+                  
                   {session.blocked_things.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200/30 dark:border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-white/[0.06]">
                       <div className="flex flex-wrap gap-2">
                         {session.blocked_things.map((site, siteIndex) => (
                           <span
                             key={siteIndex}
-                            className="text-xs px-2 py-1 rounded bg-gray-200/50 dark:bg-white/5 text-gray-600 dark:text-gray-400 font-light"
+                            className="inline-flex items-center text-[11px] px-2.5 py-1.5 rounded-md bg-gray-100/80 dark:bg-white/[0.06] text-gray-700 dark:text-gray-300 font-medium border border-gray-200/50 dark:border-white/[0.04] hover:bg-gray-200/80 dark:hover:bg-white/[0.09] transition-colors"
                           >
                             {site}
                           </span>

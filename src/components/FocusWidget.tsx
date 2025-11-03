@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { PhysicalPosition } from "@tauri-apps/api/window";
 
@@ -14,12 +14,24 @@ function formatTime(seconds: number): string {
   return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 }
 
+function getResponsiveFontSize(textLength: number): string {
+  if (textLength <= 20) return "text-sm"; // Default
+  if (textLength <= 30) return "text-[13px]";
+  if (textLength <= 40) return "text-xs";
+  return "text-[11px]"; // Very long text
+}
+
 export function FocusWidget({ goal, duration, timeLeft }: FocusWidgetProps) {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const widgetRef = useRef<HTMLDivElement>(null);
   const progress =
     duration > 0 ? Math.min(((duration - timeLeft) / duration) * 100, 100) : 0;
+
+  const goalFontSize = useMemo(
+    () => getResponsiveFontSize(goal.length),
+    [goal.length],
+  );
 
   useEffect(() => {
     const handleMouseDown = async (e: MouseEvent) => {
@@ -81,19 +93,29 @@ export function FocusWidget({ goal, duration, timeLeft }: FocusWidgetProps) {
   return (
     <div
       ref={widgetRef}
-      className="relative flex h-[72px] w-[380px] select-none rounded-2xl border border-gray-300/30 dark:border-white/8 bg-white dark:bg-[#0f0f0f] shadow-[0_16px_45px_rgba(0,0,0,0.15)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.45)] font-paper"
+      className="relative flex h-[72px] w-[380px] select-none rounded-2xl border border-gray-300/40 dark:border-white/[0.12] bg-white dark:bg-[#0a0a0a] shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] font-paper backdrop-blur-xl"
     >
-      <div className="pointer-events-none absolute inset-px rounded-[22px] border border-gray-300/30 dark:border-white/10" />
+      <div className="pointer-events-none absolute inset-px rounded-[15px] border border-gray-200/50 dark:border-white/[0.08]" />
+
       <div
-        className="pointer-events-none absolute inset-1 rounded-[22px] bg-gray-900/10 dark:bg-white/4 transition-[clip-path] duration-500 ease-out"
-        style={{ clipPath: `inset(0 ${100 - progress}% 0 0)` }}
+        className="pointer-events-none absolute inset-[3px] rounded-[14px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 dark:from-blue-400/25 dark:via-purple-400/25 dark:to-pink-400/25 transition-[clip-path] duration-500 ease-out"
+        style={{ clipPath: `inset(0 ${100 - progress}% 0 0 round 14px)` }}
       />
-      <div className="relative z-10 flex flex-1 items-center gap-4 px-6">
-        <div className="shrink-0 rounded-xl bg-gray-100 dark:bg-[#181818] px-4 py-2.5 text-lg leading-none text-gray-900 dark:text-gray-100">
+
+      <div
+        className="pointer-events-none absolute inset-[3px] rounded-[14px] bg-gradient-to-b from-transparent via-transparent to-black/5 dark:to-white/5 transition-[clip-path] duration-500 ease-out"
+        style={{ clipPath: `inset(0 ${100 - progress}% 0 0 round 14px)` }}
+      />
+
+      <div className="relative z-10 flex flex-1 items-center gap-3.5 px-5">
+        <div className="shrink-0 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a1a] dark:to-[#151515] px-4 py-2.5 text-[17px] font-medium leading-none text-gray-900 dark:text-gray-50 shadow-sm border border-gray-200/50 dark:border-white/[0.08]">
           {formatTime(timeLeft)}
         </div>
-        <div className="flex-1 min-w-0">
-          <span className="block truncate text-sm tracking-tight text-gray-700 dark:text-gray-200/90">
+
+        <div className="flex-1 min-w-0 pr-1">
+          <span
+            className={`block truncate ${goalFontSize} font-medium tracking-tight text-gray-800 dark:text-gray-100 leading-relaxed`}
+          >
             {goal}
           </span>
         </div>
