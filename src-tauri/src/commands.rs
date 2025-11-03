@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
 use std::path::Path;
+use std::process::Command;
 use tauri::{AppHandle, Manager, PhysicalSize};
 
 use crate::block;
@@ -25,14 +26,147 @@ pub struct Session {
 type Result<T> = std::result::Result<T, String>;
 const STORAGE_DIR: &str = "/home/dipxsy/.focus_sessions";
 
-/// Authorize once at app start - extends sudo timestamp for 15 minutes
 #[tauri::command]
-pub fn authorize_admin() -> Result<String> {
-    block::authorize_once()
-        .map(|_| {
-            "Authorization successful. You won't be prompted again for 15 minutes.".to_string()
-        })
-        .map_err(|e| format!("Authorization failed: {}", e))
+pub fn setup_persistent_authorization() -> Result<String> {
+    const SUDOERS_FILE: &str = "/etc/sudoers.d/focus";
+
+    if Path::new(SUDOERS_FILE).exists() {
+        return Ok("Authorization already configured".to_string());
+    }
+
+    let username = std::env::var("USER")
+        .or_else(|_| std::env::var("USERNAME"))
+        .map_err(|_| "Failed to get username".to_string())?;
+
+    let sudoers_content = format!(
+        "# Focus App - Passwordless sudo for specific commands\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/tee /etc/hosts\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/cp * /etc/hosts\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart systemd-resolved\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nscd\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/resolvectl flush-caches\n\
+         {} ALL=(ALL) NOPASSWD: /usr/bin/systemd-resolve --flush-caches\n",
+        username, username, username, username, username, username
+    );
+
+    let temp_file = std::env::temp_dir().join("focus_sudoers_temp");
+    fs::write(&temp_file, &sudoers_content)
+        .map_err(|e| format!("Failed to create temporary file: {}", e))?;
+
+    let temp_file_str = temp_file
+        .to_str()
+        .ok_or("Failed to convert temp file path to string")?;
+
+
+    if !Command::new("which")
+        .arg("pkexec")
+        .output()
+        .is_ok_and(|o| o.status.success())
+    {
+        let _ = fs::remove_file(&temp_file);
+        return Err(
+            "pkexec is not installed. Please install it:\n\n\
+             Ubuntu/Debian: sudo apt install policykit-1\n\
+             Arch Linux: sudo pacman -S polkit\n\
+             Fedora: sudo dnf install polkit\n\n\
+             Or run the app from terminal and it will use sudo instead."
+                .to_string(),
+        );
+    }
+
+    let script_path = std::env::temp_dir().join("focus_install_sudoers.sh");
+    let script_content = format!(
+        "#!/bin/bash\n\
+         cp {} /etc/sudoers.d/focus\n\
+         chmod 440 /etc/sudoers.d/focus\n\
+         chown root:root /etc/sudoers.d/focus\n",
+        temp_file_str
+    );
+    
+    fs::write(&script_path, script_content)
+        .map_err(|e| format!("Failed to create install script: {}", e))?;
+
+    #[cfg(target_os = "linux")]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(&script_path)
+            .map_err(|e| format!("Failed to get script permissions: {}", e))?
+            .permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&script_path, perms)
+            .map_err(|e| format!("Failed to set script permissions: {}", e))?;
+    }
+
+    let script_str = script_path
+        .to_str()
+        .ok_or("Failed to convert script path to string")?;
+
+    let output = Command::new("pkexec")
+        .arg("bash")
+        .arg(script_str)
+        .output()
+        .map_err(|e| format!("Failed to execute pkexec: {}", e))?;
+
+    let _ = fs::remove_file(&script_path);
+    let _ = fs::remove_file(&temp_file);
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        
+        if stderr.contains("dismissed") || stderr.contains("cancelled") {
+            return Err("Authentication cancelled by user.".to_string());
+        }
+        
+        return Err(format!(
+            "Failed to install sudoers file. Please ensure:\n\
+             1. You entered the correct password\n\
+             2. Your user has sudo privileges\n\n\
+             Error: {}",
+            stderr
+        ));
+    }
+
+    Ok("Authorization configured successfully".to_string())
+}
+
+#[tauri::command]
+pub fn check_authorization_status() -> Result<bool> {
+    const SUDOERS_FILE: &str = "/etc/sudoers.d/focus";
+    Ok(Path::new(SUDOERS_FILE).exists())
+}
+
+#[tauri::command]
+pub fn remove_authorization() -> Result<String> {
+    const SUDOERS_FILE: &str = "/etc/sudoers.d/focus";
+    
+    if !Path::new(SUDOERS_FILE).exists() {
+        return Ok("No authorization to remove".to_string());
+    }
+
+    if !Command::new("which")
+        .arg("pkexec")
+        .output()
+        .is_ok_and(|o| o.status.success())
+    {
+        return Err(
+            "pkexec is not installed. Please remove the file manually:\n\
+             sudo rm /etc/sudoers.d/focus"
+                .to_string(),
+        );
+    }
+
+    let output = Command::new("pkexec")
+        .arg("rm")
+        .arg(SUDOERS_FILE)
+        .output()
+        .map_err(|e| format!("Failed to remove authorization: {}", e))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("Failed to remove authorization: {}", stderr));
+    }
+
+    Ok("Authorization removed successfully".to_string())
 }
 
 #[tauri::command]
