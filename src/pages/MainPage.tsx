@@ -16,7 +16,6 @@ export function MainPage() {
   const [goal, setGoal] = useState("");
   const [duration, setDuration] = useState("1 hour");
   const [tags, setTags] = useState<Tag[]>([]);
-  const [nextId, setNextId] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const { setSession } = useSessionStore();
@@ -25,12 +24,17 @@ export function MainPage() {
     setTags(tags.filter((tag) => tag.id !== id));
   };
 
-  const handleAddTag = (label: string) => {
-    if (tags.some((tag) => tag.label.toLowerCase() === label.toLowerCase())) {
+  const handleAddTag = (tag: Tag) => {
+    if (
+      tags.some(
+        (t) =>
+          t.label.toLowerCase() === tag.label.toLowerCase() &&
+          t.type === tag.type,
+      )
+    ) {
       return;
     }
-    setTags([...tags, { id: nextId.toString(), label }]);
-    setNextId(nextId + 1);
+    setTags([...tags, tag]);
   };
 
   const handleStartFocus = async () => {
@@ -42,16 +46,24 @@ export function MainPage() {
     setIsLoading(true);
     try {
       const durationSeconds = parseDuration(duration);
-      const blockedSites = tags.map((tag) => tag.label);
+
+      const blockedSites = tags
+        .filter((tag) => tag.type === "website")
+        .map((tag) => tag.label);
+
+      const blockedApps = tags
+        .filter((tag) => tag.type === "app")
+        .map((tag) => `${tag.label}|||${tag.executable || tag.label}`);
 
       const result = await invoke<string>("create_and_store_session", {
         goal: goal.trim(),
         duration: durationSeconds,
         blockedThings: blockedSites,
+        blockedApps: blockedApps,
       });
 
       console.log("Focus session started successfully!", result);
-      setSession(goal.trim(), durationSeconds);
+      setSession(goal.trim(), durationSeconds, blockedApps);
       navigate("/widget");
     } catch (error) {
       console.error("Failed to start focus session:", error);
@@ -76,7 +88,7 @@ export function MainPage() {
       <div className="flex items-start mb-6">
         <ModeToggle />
       </div>
-      
+
       <div className="space-y-6 px-2 flex-1">
         <GoalInput value={goal} onChange={setGoal} />
         <DurationSelect value={duration} onValueChange={setDuration} />
@@ -86,7 +98,7 @@ export function MainPage() {
           onAddTag={handleAddTag}
         />
       </div>
-      
+
       <div className="mt-auto pt-6">
         <FooterButtons
           isSessionActive={false}

@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { useSessionStore } from "@/store/sessionStore";
 import { FocusWidget } from "@/components/FocusWidget";
+import { BlockNotificationWidget } from "@/components/BlockNotificationWidget";
 
 export function WidgetPage() {
   const navigate = useNavigate();
-  const { goal, duration, timeLeft, updateTimeLeft } = useSessionStore();
+  const { goal, duration, timeLeft, updateTimeLeft, blockedApps } = useSessionStore();
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isEndingRef = useRef(false);
+  
+  const hasBlockedApps = blockedApps && blockedApps.length > 0;
 
   const playFinishSound = async () => {
     return new Promise<void>((resolve, reject) => {
@@ -107,8 +110,11 @@ export function WidgetPage() {
   }
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-transparent p-0 m-0 overflow-hidden">
-      <FocusWidget goal={goal} duration={duration} timeLeft={timeLeft} />
-    </div>
+    <>
+      <BlockNotificationWidget isActive={hasBlockedApps} />
+      <div className="w-full h-full flex items-center justify-center bg-transparent p-0 m-0 overflow-hidden">
+        <FocusWidget goal={goal} duration={duration} timeLeft={timeLeft} />
+      </div>
+    </>
   );
 }

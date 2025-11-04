@@ -1,13 +1,19 @@
 mod block;
 mod commands;
+mod app_blocker;
 
 use tauri::Manager;
+use std::sync::Mutex;
+use app_blocker::AppBlocker;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            // Initialize app blocker state
+            app.manage(Mutex::new(AppBlocker::new()));
+            
             if let Some(window) = app.get_webview_window("main") {
                 use tauri::PhysicalSize;
                 let _ = window.unmaximize();
@@ -26,7 +32,11 @@ pub fn run() {
             commands::get_all_sessions,
             commands::resize_window_to_widget,
             commands::resize_window_to_main,
-            commands::resize_window_to_stats
+            commands::resize_window_to_stats,
+            commands::search_apps,
+            commands::start_app_blocking,
+            commands::stop_app_blocking,
+            commands::get_block_attempts
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
