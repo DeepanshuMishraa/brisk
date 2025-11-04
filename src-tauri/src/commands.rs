@@ -4,15 +4,19 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
-use tauri::{AppHandle, Manager, PhysicalSize};
+use std::sync::Mutex;
+use tauri::{AppHandle, Manager, PhysicalSize, State};
 
 use crate::block;
+use crate::app_blocker::{AppBlocker, BlockedApp, InstalledApp, search_installed_apps};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Store {
     goal: String,
     duration: u64,
     blocked_things: Vec<String>,
+    #[serde(default)]
+    blocked_apps: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -20,6 +24,8 @@ pub struct Session {
     goal: String,
     duration: u64,
     blocked_things: Vec<String>,
+    #[serde(default)]
+    blocked_apps: Vec<String>,
     timestamp: i64,
 }
 
@@ -174,14 +180,33 @@ pub fn create_and_store_session(
     goal: String,
     duration: u64,
     blocked_things: Vec<String>,
+    blocked_apps: Vec<String>,
+    app_blocker: State<Mutex<AppBlocker>>,
 ) -> Result<String> {
     if !blocked_things.is_empty() {
         block::block_sites(&blocked_things).map_err(|e| format!("Failed to block sites: {}", e))?;
     }
+    
+    // Start app blocking if apps are specified
+    if !blocked_apps.is_empty() {
+        let apps: Vec<BlockedApp> = blocked_apps.iter().map(|app_json| {
+            // Parse app JSON string (format: "name|||executable")
+            let parts: Vec<&str> = app_json.split("|||").collect();
+            BlockedApp {
+                name: parts.get(0).unwrap_or(&"Unknown").to_string(),
+                executable: parts.get(1).unwrap_or(&"unknown").to_string(),
+            }
+        }).collect();
+        
+        let blocker = app_blocker.lock().unwrap();
+        blocker.start_blocking(apps).map_err(|e| format!("Failed to start app blocking: {}", e))?;
+    }
+    
     let store = Store {
         goal,
         duration,
         blocked_things,
+        blocked_apps,
     };
 
     let dir = Path::new(STORAGE_DIR);
@@ -207,9 +232,14 @@ pub fn create_and_store_session(
 }
 
 #[tauri::command]
-pub fn unblock_all_sites() -> Result<String> {
+pub fn unblock_all_sites(app_blocker: State<Mutex<AppBlocker>>) -> Result<String> {
     block::unblock_sites().map_err(|e| format!("Failed to unblock sites: {}", e))?;
-    Ok("Sites unblocked successfully".to_string())
+    
+    // Stop app blocking
+    let blocker = app_blocker.lock().unwrap();
+    blocker.stop_blocking().map_err(|e| format!("Failed to stop app blocking: {}", e))?;
+    
+    Ok("Sites and apps unblocked successfully".to_string())
 }
 
 #[tauri::command]
@@ -248,6 +278,7 @@ pub fn get_all_sessions() -> Result<Vec<Session>> {
                             goal: store.goal,
                             duration: store.duration,
                             blocked_things: store.blocked_things,
+                            blocked_apps: store.blocked_apps,
                             timestamp,
                         });
                     }
@@ -451,4 +482,45 @@ pub async fn resize_window_to_stats(app: AppHandle) -> Result<String> {
         "Window resized to stats size: {}x{}",
         current_size.width, current_size.height
     ))
+}
+
+#[tauri::command]
+pub fn search_apps(query: String) -> Result<Vec<InstalledApp>> {
+    if query.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+    
+    search_installed_apps(&query)
+}
+
+#[tauri::command]
+pub fn start_app_blocking(
+    apps: Vec<String>,
+    app_blocker: State<Mutex<AppBlocker>>,
+) -> Result<String> {
+    let blocked_apps: Vec<BlockedApp> = apps.iter().map(|app_json| {
+        let parts: Vec<&str> = app_json.split("|||").collect();
+        BlockedApp {
+            name: parts.get(0).unwrap_or(&"Unknown").to_string(),
+            executable: parts.get(1).unwrap_or(&"unknown").to_string(),
+        }
+    }).collect();
+    
+    let blocker = app_blocker.lock().unwrap();
+    blocker.start_blocking(blocked_apps)?;
+    
+    Ok("App blocking started".to_string())
+}
+
+#[tauri::command]
+pub fn stop_app_blocking(app_blocker: State<Mutex<AppBlocker>>) -> Result<String> {
+    let blocker = app_blocker.lock().unwrap();
+    blocker.stop_blocking()?;
+    Ok("App blocking stopped".to_string())
+}
+
+#[tauri::command]
+pub fn get_block_attempts(app_blocker: State<Mutex<AppBlocker>>) -> Result<std::collections::HashMap<String, u32>> {
+    let blocker = app_blocker.lock().unwrap();
+    Ok(blocker.get_block_attempts())
 }
