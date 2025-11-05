@@ -145,7 +145,7 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
           </TabsList>
 
           <TabsContent value="websites" className="mt-3">
-            <div className="bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-xl rounded-2xl p-3 min-h-[70px] flex items-start gap-2 flex-wrap relative shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
+            <div className="bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-xl rounded-2xl p-3 min-h-[70px] flex items-start gap-2 flex-wrap relative">
               <div className="flex items-center gap-2 flex-wrap flex-1 w-full">
                 {tags.filter(t => t.type === 'website').map(tag => (
                   <Badge key={tag.id} className="bg-gradient-to-br from-white/20 to-white/10 dark:from-white/15 dark:to-white/5 border border-white/30 dark:border-white/20 text-gray-900 dark:text-white rounded-full px-3 py-1.5 backdrop-blur-md shadow-[0_4px_16px_0_rgba(59,130,246,0.2)] flex items-center gap-2 h-8 text-xs font-medium">
@@ -165,7 +165,7 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
           </TabsContent>
 
           <TabsContent value="apps" className="mt-3">
-            <div className="bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-xl rounded-2xl p-3 min-h-[70px] flex items-start gap-2 flex-wrap relative shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
+            <div className="bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-xl rounded-2xl p-3 min-h-[70px] flex items-start gap-2 flex-wrap relative">
               <div className="flex items-center gap-2 flex-wrap flex-1 w-full">
                 {tags.filter(t => t.type === 'app').map(tag => (
                   <Badge key={tag.id} className="bg-gradient-to-br from-red-500/20 to-red-400/10 dark:from-red-500/15 dark:to-red-400/5 border border-red-400/30 dark:border-red-400/20 text-red-900 dark:text-red-200 rounded-full px-3 py-1.5 backdrop-blur-md shadow-[0_4px_16px_0_rgba(239,68,68,0.2)] flex items-center gap-2 h-8 text-xs font-medium">
