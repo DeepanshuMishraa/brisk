@@ -31,7 +31,6 @@
   },
   "bundle": {
     "active": true,
-    "targets": "appimage",
     "icon": ["icons/brisk.png"]
   }
 }
