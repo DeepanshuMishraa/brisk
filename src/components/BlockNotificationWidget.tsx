@@ -24,7 +24,6 @@ export function BlockNotificationWidget({ isActive, onClose }: BlockNotification
       return
     }
 
-    // Listen for window events from Rust backend
     const handleBlockEvent = (event: CustomEvent) => {
       const appName = event.detail.appName as string
       const newNotification: BlockNotification = {
@@ -35,7 +34,6 @@ export function BlockNotificationWidget({ isActive, onClose }: BlockNotification
       setNotifications(prev => [...prev, newNotification])
       setCurrentNotification(newNotification)
 
-      // Auto-hide after 3 seconds
       setTimeout(() => {
         setCurrentNotification(null)
       }, 3000)
@@ -50,11 +48,7 @@ export function BlockNotificationWidget({ isActive, onClose }: BlockNotification
     }
   }, [isActive])
 
-  // Group notifications by app name for count
-  const blockCounts = notifications.reduce((acc, notif) => {
-    acc[notif.appName] = (acc[notif.appName] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+
 
   const totalBlocks = notifications.length
 

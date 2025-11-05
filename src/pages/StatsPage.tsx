@@ -128,10 +128,9 @@ export function StatsPage() {
             <div className="space-y-3">
               {sessions.map((session, index) => (
                 <div
-                  key={session.timestamp}
+                  key={session.timestamp && index}
                   className="group relative py-5 px-6 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white dark:bg-[#121212] hover:border-gray-300/80 dark:hover:border-white/[0.14] hover:shadow-[0_2px_16px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_2px_16px_rgba(0,0,0,0.3)] transition-all duration-200"
                 >
-                   
                   <div className="relative flex items-start justify-between gap-8">
                     <div className="flex-1 min-w-0 space-y-2">
                       <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-50 truncate leading-tight">
@@ -141,68 +140,80 @@ export function StatsPage() {
                         {formatDate(session.timestamp)}
                       </div>
                     </div>
-                    
-                     <div className="flex items-center gap-6 shrink-0">
-                       <div className="text-right space-y-1.5">
-                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-br from-emerald-500/[0.08] to-teal-500/[0.08] dark:from-emerald-400/[0.12] dark:to-teal-400/[0.12] border border-emerald-500/20 dark:border-emerald-400/20">
-                           <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">
-                             {formatTime(session.duration)}
-                           </span>
-                         </div>
-                         {(session.blocked_things.length > 0 || session.blocked_apps.length > 0) && (
-                           <div className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
-                             {session.blocked_things.length > 0 && (
-                               <div>{session.blocked_things.length} {session.blocked_things.length === 1 ? "site" : "sites"}</div>
-                             )}
-                             {session.blocked_apps.length > 0 && (
-                               <div>{session.blocked_apps.length} {session.blocked_apps.length === 1 ? "app" : "apps"}</div>
-                             )}
-                           </div>
-                         )}
-                       </div>
-                     </div>
+
+                    <div className="flex items-center gap-6 shrink-0">
+                      <div className="text-right space-y-1.5">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-br from-emerald-500/[0.08] to-teal-500/[0.08] dark:from-emerald-400/[0.12] dark:to-teal-400/[0.12] border border-emerald-500/20 dark:border-emerald-400/20">
+                          <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">
+                            {formatTime(session.duration)}
+                          </span>
+                        </div>
+                        {(session.blocked_things.length > 0 ||
+                          session.blocked_apps.length > 0) && (
+                          <div className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                            {session.blocked_things.length > 0 && (
+                              <div>
+                                {session.blocked_things.length}{" "}
+                                {session.blocked_things.length === 1
+                                  ? "site"
+                                  : "sites"}
+                              </div>
+                            )}
+                            {session.blocked_apps.length > 0 && (
+                              <div>
+                                {session.blocked_apps.length}{" "}
+                                {session.blocked_apps.length === 1
+                                  ? "app"
+                                  : "apps"}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  
-                   {(session.blocked_things.length > 0 || session.blocked_apps.length > 0) && (
-                     <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-white/[0.06]">
-                       <div className="space-y-3">
-                         {session.blocked_things.length > 0 && (
-                           <div>
-                             <h4 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                               Blocked Sites
-                             </h4>
-                             <div className="flex flex-wrap gap-2">
-                               {session.blocked_things.map((site, siteIndex) => (
-                                 <span
-                                   key={`site-${siteIndex}`}
-                                   className="inline-flex items-center text-[11px] px-2.5 py-1.5 rounded-md bg-blue-100/50 dark:bg-blue-500/[0.15] text-blue-700 dark:text-blue-300 font-medium border border-blue-200/50 dark:border-blue-500/[0.2] hover:bg-blue-200/50 dark:hover:bg-blue-500/[0.2] transition-colors"
-                                 >
-                                   {site}
-                                 </span>
-                               ))}
-                             </div>
-                           </div>
-                         )}
-                         {session.blocked_apps.length > 0 && (
-                           <div>
-                             <h4 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                               Blocked Apps
-                             </h4>
-                             <div className="flex flex-wrap gap-2">
-                               {session.blocked_apps.map((app, appIndex) => (
-                                 <span
-                                   key={`app-${appIndex}`}
-                                   className="inline-flex items-center text-[11px] px-2.5 py-1.5 rounded-md bg-orange-100/50 dark:bg-orange-500/[0.15] text-orange-700 dark:text-orange-300 font-medium border border-orange-200/50 dark:border-orange-500/[0.2] hover:bg-orange-200/50 dark:hover:bg-orange-500/[0.2] transition-colors"
-                                 >
-                                   {app}
-                                 </span>
-                               ))}
-                             </div>
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                   )}
+
+                  {(session.blocked_things.length > 0 ||
+                    session.blocked_apps.length > 0) && (
+                    <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-white/[0.06]">
+                      <div className="space-y-3">
+                        {session.blocked_things.length > 0 && (
+                          <div>
+                            <h4 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                              Blocked Sites
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {session.blocked_things.map((site, siteIndex) => (
+                                <span
+                                  key={`site-${siteIndex}`}
+                                  className="inline-flex items-center text-[11px] px-2.5 py-1.5 rounded-md bg-blue-100/50 dark:bg-blue-500/[0.15] text-blue-700 dark:text-blue-300 font-medium border border-blue-200/50 dark:border-blue-500/[0.2] hover:bg-blue-200/50 dark:hover:bg-blue-500/[0.2] transition-colors"
+                                >
+                                  {site}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {session.blocked_apps.length > 0 && (
+                          <div>
+                            <h4 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                              Blocked Apps
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {session.blocked_apps.map((app, appIndex) => (
+                                <span
+                                  key={`app-${appIndex}`}
+                                  className="inline-flex items-center text-[11px] px-2.5 py-1.5 rounded-md bg-orange-100/50 dark:bg-orange-500/[0.15] text-orange-700 dark:text-orange-300 font-medium border border-orange-200/50 dark:border-orange-500/[0.2] hover:bg-orange-200/50 dark:hover:bg-orange-500/[0.2] transition-colors"
+                                >
+                                  {app}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
