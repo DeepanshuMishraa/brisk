@@ -36,7 +36,8 @@ pub fn run() {
             commands::search_apps,
             commands::start_app_blocking,
             commands::stop_app_blocking,
-            commands::get_block_attempts
+            commands::get_block_attempts,
+            commands::show_session_complete_notification
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

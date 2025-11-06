@@ -1,8 +1,9 @@
 export interface Tag {
   id: string;
   label: string;
-  type: 'website' | 'app';
-  executable?: string; // For apps only
+  type: "website" | "app";
+  executable?: string;
+  icon?: string;
 }
 
 export interface InstalledApp {

@@ -53,7 +53,7 @@ export function MainPage() {
 
       const blockedApps = tags
         .filter((tag) => tag.type === "app")
-        .map((tag) => `${tag.label}|||${tag.executable || tag.label}`);
+        .map((tag) => `${tag.label}|||${tag.executable || tag.label}|||${tag.icon || ''}`);
 
       const result = await invoke<string>("create_and_store_session", {
         goal: goal.trim(),

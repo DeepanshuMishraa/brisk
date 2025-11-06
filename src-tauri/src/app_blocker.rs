@@ -9,10 +9,12 @@ use std::time::Duration;
 #[cfg(target_os = "linux")]
 use std::process::Stdio;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BlockedApp {
     pub name: String,
     pub executable: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -76,7 +78,7 @@ impl AppBlocker {
                                 *attempts.entry(app.name.clone()).or_insert(0) += 1;
                             }
 
-                            show_block_notification(&app.name);
+                            show_block_notification(&app.name, app.icon.as_deref());
 
                             for pid in pids {
                                 if let Err(e) = kill_process(pid) {
@@ -336,18 +338,19 @@ fn parse_desktop_file(content: &str, query: &str) -> Option<InstalledApp> {
     })
 }
 
-fn show_block_notification(app_name: &str) {
+fn show_block_notification(app_name: &str, icon: Option<&str>) {
     #[cfg(target_os = "linux")]
     {
+        let icon_arg = icon.unwrap_or("dialog-error");
         let _ = Command::new("notify-send")
             .arg("-u")
             .arg("critical")
             .arg("-t")
             .arg("3000")
             .arg("-i")
-            .arg("dialog-error")
-            .arg(format!("{} Blocked", app_name))
-            .arg("This app is blocked during your focus session")
+            .arg(icon_arg)
+            .arg(format!("{} is blocked", app_name))
+            .arg(format!("Brisk is blocking {}", app_name))
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn();

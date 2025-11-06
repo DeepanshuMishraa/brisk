@@ -57,6 +57,14 @@ export function WidgetPage() {
         try {
           playFinishSound().catch(err => console.error("Sound error:", err));
           
+          // Calculate duration in minutes
+          const durationMinutes = Math.floor(duration / 60);
+          
+          // Show session complete notification
+          await invoke<string>("show_session_complete_notification", { 
+            durationMinutes: durationMinutes 
+          }).catch(err => console.error("Notification error:", err));
+          
           await new Promise((resolve) => setTimeout(resolve, 500));
           
           navigate("/stats", { replace: true });

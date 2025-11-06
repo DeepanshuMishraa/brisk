@@ -190,11 +190,12 @@ pub fn create_and_store_session(
     // Start app blocking if apps are specified
     if !blocked_apps.is_empty() {
         let apps: Vec<BlockedApp> = blocked_apps.iter().map(|app_json| {
-            // Parse app JSON string (format: "name|||executable")
+            // Parse app JSON string (format: "name|||executable|||icon")
             let parts: Vec<&str> = app_json.split("|||").collect();
             BlockedApp {
                 name: parts.get(0).unwrap_or(&"Unknown").to_string(),
                 executable: parts.get(1).unwrap_or(&"unknown").to_string(),
+                icon: parts.get(2).map(|s| s.to_string()),
             }
         }).collect();
         
@@ -503,6 +504,7 @@ pub fn start_app_blocking(
         BlockedApp {
             name: parts.get(0).unwrap_or(&"Unknown").to_string(),
             executable: parts.get(1).unwrap_or(&"unknown").to_string(),
+            icon: parts.get(2).map(|s| s.to_string()),
         }
     }).collect();
     
@@ -523,4 +525,39 @@ pub fn stop_app_blocking(app_blocker: State<Mutex<AppBlocker>>) -> Result<String
 pub fn get_block_attempts(app_blocker: State<Mutex<AppBlocker>>) -> Result<std::collections::HashMap<String, u32>> {
     let blocker = app_blocker.lock().unwrap();
     Ok(blocker.get_block_attempts())
+}
+
+#[tauri::command]
+pub fn show_session_complete_notification(duration_minutes: u64) -> Result<String> {
+    #[cfg(target_os = "linux")]
+    {
+        use std::process::Stdio;
+        
+        let duration_text = if duration_minutes >= 60 {
+            let hours = duration_minutes / 60;
+            let mins = duration_minutes % 60;
+            if mins > 0 {
+                format!("{} hour{} and {} minute{}", hours, if hours > 1 { "s" } else { "" }, mins, if mins > 1 { "s" } else { "" })
+            } else {
+                format!("{} hour{}", hours, if hours > 1 { "s" } else { "" })
+            }
+        } else {
+            format!("{} minute{}", duration_minutes, if duration_minutes > 1 { "s" } else { "" })
+        };
+
+        let _ = Command::new("notify-send")
+            .arg("-u")
+            .arg("normal")
+            .arg("-t")
+            .arg("5000")
+            .arg("-i")
+            .arg("emblem-default")
+            .arg("Focus Session Complete!")
+            .arg(format!("Congratulations! You completed a {} focus session", duration_text))
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
+    }
+    
+    Ok("Notification sent".to_string())
 }

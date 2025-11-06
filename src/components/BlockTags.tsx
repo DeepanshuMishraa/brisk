@@ -27,8 +27,7 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
   const suggestionsRef = useRef<HTMLDivElement>(null)
 
   const currentInput = activeTab === 'websites' ? websitesInput : appsInput
-
-  // Debounce input value
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedValue(currentInput)
@@ -36,13 +35,12 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
     return () => clearTimeout(timer)
   }, [currentInput])
 
-  // Get website suggestions
+
   const websiteSuggestions = useMemo(() => {
     if (!debouncedValue.trim() || activeTab !== 'websites') return []
     return searchSites(debouncedValue).slice(0, 5)
   }, [debouncedValue, activeTab])
 
-  // Search for apps
   useEffect(() => {
     if (activeTab === 'apps' && debouncedValue.trim()) {
       invoke<InstalledApp[]>('search_apps', { query: debouncedValue })
@@ -78,7 +76,8 @@ export function BlockTags({ tags, onRemoveTag, onAddTag }: BlockTagsProps) {
       id: Date.now().toString(),
       label: app.display_name,
       type: 'app',
-      executable: app.executable
+      executable: app.executable,
+      icon: app.icon || undefined
     })
     setAppsInput("")
     setShowSuggestions(false)
