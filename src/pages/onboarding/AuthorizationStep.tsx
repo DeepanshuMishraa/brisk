@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft, ShieldCheck, AlertCircle } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -29,7 +27,7 @@ export function AuthorizationStep({ onPrev }: AuthorizationStepProps) {
       setError(
         typeof err === "string" 
           ? err 
-          : "Authorization failed. Please try again or check your password."
+          : "Authorization failed. Please verify your password."
       );
     } finally {
       setIsAuthorizing(false);
@@ -37,73 +35,59 @@ export function AuthorizationStep({ onPrev }: AuthorizationStepProps) {
   };
 
   return (
-    <div className="flex flex-col items-center text-center py-8 min-h-0">
-      <div className="mb-6">
-        <ShieldCheck className="h-16 w-16 text-gray-900 dark:text-white" strokeWidth={1.5} />
-      </div>
-      <h1 className="text-4xl font-semibold text-gray-900 dark:text-white mb-4">
-        System Authorization
-      </h1>
-      <div className="text-gray-600 dark:text-gray-400 text-base mb-6 max-w-md space-y-3">
-        <p>
-          Focus needs to modify system files to block websites.
-        </p>
-        <p>
-          You'll be asked for your password once to set this up.
-        </p>
-        <p className="font-medium text-gray-900 dark:text-white">
-          After this, you won't need to enter it again.
-        </p>
-      </div>
-      <div className="mb-6 w-full max-w-md border border-gray-200 dark:border-gray-800 rounded-lg p-4 text-left">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-gray-900 dark:text-white flex-shrink-0 mt-0.5" strokeWidth={1.5} />
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              What this allows:
-            </p>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>? Modify /etc/hosts file</li>
-              <li>? Restart DNS services</li>
-              <li>? Block/unblock websites</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      {error && (
-        <div className="mb-6 w-full max-w-md border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 rounded-lg p-4">
-          <p className="text-sm text-red-800 dark:text-red-200">
-            {error}
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-14 w-full max-w-lg">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-white">
+            One more thing
+          </h1>
+          <p className="text-lg text-black/70 dark:text-white/70 leading-relaxed max-w-md">
+            Brisq needs system permission to block websites during your focus sessions.
           </p>
         </div>
-      )}
-      <div className="flex items-center gap-4">
-        <Button
-          onClick={onPrev}
-          disabled={isAuthorizing}
-          variant="ghost"
-          className="px-6 py-6 text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-50"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <Button
-          onClick={handleGrantAccess}
-          disabled={isAuthorizing}
-          className="px-8 py-6 text-base bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 border-0 disabled:opacity-50"
-        >
-          {isAuthorizing ? (
-            <>
-              <div className="h-4 w-4 mr-2 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin" />
-              Authorizing...
-            </>
-          ) : (
-            <>
-              Grant Access
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
+        <div className="w-full bg-black/5 dark:bg-white/5 rounded-2xl px-8 py-6">
+          <div className="flex flex-col gap-3 text-sm text-black/70 dark:text-white/70">
+            <p className="text-base text-black dark:text-white font-semibold mb-3">
+              What we'll access:
+            </p>
+            <p>• Modify /etc/hosts file</p>
+            <p>• Restart DNS services</p>
+            <p>• Block and unblock websites</p>
+          </div>
+          <p className="text-sm text-black/60 dark:text-white/60 mt-4">
+            You'll authenticate once. We never store your password.
+          </p>
+        </div>
+        {error && (
+          <div className="w-full px-6 py-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900">
+            <p className="text-sm text-red-800 dark:text-red-200">
+              {error}
+            </p>
+          </div>
+        )}
+        <div className="flex items-center gap-4 w-full justify-center mt-2">
+          <button
+            onClick={onPrev}
+            disabled={isAuthorizing}
+            className="px-8 py-3.5 text-sm font-semibold text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors disabled:opacity-40"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleGrantAccess}
+            disabled={isAuthorizing}
+            className="px-10 py-3.5 text-sm font-semibold rounded-full bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity disabled:opacity-40 min-w-[160px]"
+          >
+            {isAuthorizing ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="inline-block w-3.5 h-3.5 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin" />
+                Authorizing
+              </span>
+            ) : (
+              "Grant Access"
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

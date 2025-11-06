@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft } from "lucide-react";
-
 interface HowItWorksStepProps {
   onNext: () => void;
   onPrev: () => void;
@@ -8,53 +5,51 @@ interface HowItWorksStepProps {
 
 export function HowItWorksStep({ onNext, onPrev }: HowItWorksStepProps) {
   const steps = [
-    "Set your goal",
-    "Choose duration",
-    "Block distracting sites",
-    "Stay focused",
+    "Set your intention",
+    "Choose your duration",
+    "Block distractions",
+    "Do the work",
   ];
 
   return (
-    <div className="flex flex-col items-center text-center py-8 min-h-0">
-      <h1 className="text-4xl font-semibold text-gray-900 dark:text-white mb-4">
-        How Focus Works
-      </h1>
-      <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md">
-        Four simple steps to maintain your focus
-      </p>
-      <div className="space-y-4 mb-8 w-full max-w-sm">
-        {steps.map((step, index) => (
-          <div
-            key={index}
-            className="flex items-center gap-4 text-left border border-gray-200 dark:border-gray-800 rounded-lg p-4"
-          >
-            <div className="flex-shrink-0 w-8 h-8 rounded-full border border-gray-900 dark:border-white flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                {index + 1}
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-16 w-full max-w-xl">
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-white">
+            How it works
+          </h1>
+        </div>
+        <div className="w-full flex flex-col gap-8">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-8"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-black dark:bg-white flex-shrink-0">
+                <span className="text-sm font-semibold text-white dark:text-black">
+                  {index + 1}
+                </span>
+              </div>
+              <span className="text-xl text-black dark:text-white">
+                {step}
               </span>
             </div>
-            <span className="text-gray-900 dark:text-white font-medium">
-              {step}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-4">
-        <Button
-          onClick={onPrev}
-          variant="ghost"
-          className="px-6 py-6 text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <Button
-          onClick={onNext}
-          className="px-8 py-6 text-base bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 border-0"
-        >
-          Continue
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+          ))}
+        </div>
+        <div className="flex items-center gap-4 w-full justify-center mt-4">
+          <button
+            onClick={onPrev}
+            className="px-8 py-3.5 text-sm font-semibold text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors"
+          >
+            Back
+          </button>
+          <button
+            onClick={onNext}
+            className="px-10 py-3.5 text-sm font-semibold rounded-full bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+          >
+            Continue
+          </button>
+        </div>
       </div>
     </div>
   );

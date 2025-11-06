@@ -48,7 +48,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       }),
     }),
     {
-      name: "focus-onboarding",
+      name: "brisq-onboarding",
     }
   )
 );
