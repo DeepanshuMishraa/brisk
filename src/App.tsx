@@ -12,11 +12,11 @@ import { useOnboardingStore } from "@/store/onboardingStore";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isOnboarded } = useOnboardingStore();
-  
+
   if (!isOnboarded) {
     return <Navigate to="/onboarding" replace />;
   }
-  
+
   return <>{children}</>;
 }
 
@@ -25,7 +25,7 @@ export default function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="brisk-ui-theme">
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="sync">
         <Routes location={location} key={location.pathname}>
           <Route
             path="/onboarding"

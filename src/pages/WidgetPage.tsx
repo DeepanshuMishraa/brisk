@@ -112,7 +112,7 @@ export function WidgetPage() {
   return (
     <>
       <BlockNotificationWidget isActive={hasBlockedApps} />
-      <div className="w-full h-full flex items-center justify-center bg-transparent p-0 m-0 overflow-hidden">
+      <div className="w-full h-full flex items-center justify-center bg-transparent p-0 m-0">
         <FocusWidget goal={goal} duration={duration} timeLeft={timeLeft} />
       </div>
     </>

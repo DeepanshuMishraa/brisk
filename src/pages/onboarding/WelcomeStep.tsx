@@ -7,7 +7,11 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
       <div className="flex flex-col items-center gap-20">
         <div className="relative">
-          <img src="/brisk.png" alt="Brisq" className="w-24 h-24 select-none" />
+          <img
+            src="/brisk.png"
+            alt="Brisq"
+            className="w-24 h-24 select-none rounded-md"
+          />
         </div>
         <div className="flex flex-col items-center gap-8 max-w-lg">
           <h1 className="text-5xl font-semibold tracking-tight text-black dark:text-white">

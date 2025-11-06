@@ -98,7 +98,7 @@ export function FocusWidget({ goal, duration, timeLeft }: FocusWidgetProps) {
       <div className="pointer-events-none absolute inset-px rounded-[15px] border border-gray-200/50 dark:border-white/[0.08]" />
 
       <div
-        className="pointer-events-none absolute inset-[3px] rounded-[14px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 dark:from-blue-400/25 dark:via-purple-400/25 dark:to-pink-400/25 transition-[clip-path] duration-500 ease-out"
+        className="pointer-events-none absolute inset-[3px] rounded-[14px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 dark:from-green-500/30 dark:via-green-400/30 dark:to-emerald-400/30 transition-[clip-path] duration-500 ease-out"
         style={{ clipPath: `inset(0 ${100 - progress}% 0 0 round 14px)` }}
       />
 
