@@ -65,11 +65,7 @@ export function WidgetPage() {
             durationMinutes: durationMinutes 
           }).catch(err => console.error("Notification error:", err));
           
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          
           navigate("/stats", { replace: true });
-          
-          await new Promise((resolve) => setTimeout(resolve, 100));
           
           await invoke<string>("resize_window_to_stats");
           

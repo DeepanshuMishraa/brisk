@@ -25,7 +25,7 @@ export default function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="brisk-ui-theme">
-      <AnimatePresence mode="sync">
+      <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route
             path="/onboarding"

@@ -253,10 +253,16 @@ pub fn get_all_sessions() -> Result<Vec<Session>> {
 
     let mut sessions = Vec::new();
 
-    let entries = fs::read_dir(dir).map_err(|e| format!("Failed to read directory: {}", e))?;
-
-    for entry in entries {
-        let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
+    let mut entries: Vec<_> = fs::read_dir(dir)
+        .map_err(|e| format!("Failed to read directory: {}", e))?
+        .filter_map(|e| e.ok())
+        .collect();
+    
+    entries.sort_by_key(|e| std::cmp::Reverse(
+        e.metadata().ok().and_then(|m| m.modified().ok())
+    ));
+    
+    for entry in entries.iter().take(50) {
         let path = entry.path();
 
         if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("json") {
@@ -267,21 +273,17 @@ pub fn get_all_sessions() -> Result<Vec<Session>> {
                     .and_then(|s| s.strip_suffix(".json"))
                 {
                     if let Ok(timestamp) = timestamp_str.parse::<i64>() {
-                        let content = fs::read_to_string(&path).map_err(|e| {
-                            format!("Failed to read file {}: {}", path.display(), e)
-                        })?;
-
-                        let store: Store = serde_json::from_str(&content).map_err(|e| {
-                            format!("Failed to parse JSON in {}: {}", path.display(), e)
-                        })?;
-
-                        sessions.push(Session {
-                            goal: store.goal,
-                            duration: store.duration,
-                            blocked_things: store.blocked_things,
-                            blocked_apps: store.blocked_apps,
-                            timestamp,
-                        });
+                        if let Ok(content) = fs::read_to_string(&path) {
+                            if let Ok(store) = serde_json::from_str::<Store>(&content) {
+                                sessions.push(Session {
+                                    goal: store.goal,
+                                    duration: store.duration,
+                                    blocked_things: store.blocked_things,
+                                    blocked_apps: store.blocked_apps,
+                                    timestamp,
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -368,9 +370,6 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
         .set_min_size(None::<PhysicalSize<u32>>)
         .map_err(|e| format!("Failed to clear min size: {}", e))?;
 
-    // Small delay to ensure constraints are cleared
-    std::thread::sleep(std::time::Duration::from_millis(50));
-
     // Step 2: Set both min and max to 900x600 to lock the window at that size
     window
         .set_min_size(Some(PhysicalSize::new(
@@ -391,9 +390,6 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
         .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
         .map_err(|e| format!("Failed to set window size: {}", e))?;
 
-    // Small delay to ensure size is applied
-    std::thread::sleep(std::time::Duration::from_millis(50));
-
     // Verify the size was set correctly, retry if needed
     let current_size = window
         .inner_size()
@@ -409,8 +405,6 @@ pub async fn resize_window_to_main(app: AppHandle) -> Result<String> {
         window
             .set_size(PhysicalSize::new(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT))
             .map_err(|e| format!("Failed to retry window size: {}", e))?;
-
-        std::thread::sleep(std::time::Duration::from_millis(100));
     }
 
     let _ = window.center();
@@ -452,10 +446,12 @@ pub async fn resize_window_to_stats(app: AppHandle) -> Result<String> {
     window
         .set_min_size(None::<PhysicalSize<u32>>)
         .map_err(|e| format!("Failed to clear min size: {}", e))?;
+
+    // Step 2: Set both min and max to 900x600 to lock the window at that size
     window
         .set_min_size(Some(PhysicalSize::new(
-            STATS_WINDOW_WIDTH,
-            STATS_WINDOW_HEIGHT,
+            MAIN_WINDOW_WIDTH,
+            MAIN_WINDOW_HEIGHT,
         )))
         .map_err(|e| format!("Failed to set min size: {}", e))?;
 

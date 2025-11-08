@@ -57,11 +57,9 @@ export function StatsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      invoke<string>("resize_window_to_stats").catch((error) => {
-        console.error("Failed to resize window on stats page mount:", error);
-      });
-    }, 100);
+    invoke<string>("resize_window_to_stats").catch((error) => {
+      console.error("Failed to resize window on stats page mount:", error);
+    });
 
     invoke<Session[]>("get_all_sessions")
       .then((data) => {
@@ -72,19 +70,16 @@ export function StatsPage() {
         console.error("Failed to fetch sessions:", error);
         setLoading(false);
       });
-
-    return () => clearTimeout(timer);
   }, []);
 
   const handleStartNew = async () => {
+    reset();
+    navigate("/");
     try {
       await invoke<string>("resize_window_to_main");
-      await new Promise((resolve) => setTimeout(resolve, 800));
     } catch (error) {
       console.error("Failed to resize to main:", error);
     }
-    reset();
-    navigate("/");
   };
 
   return (

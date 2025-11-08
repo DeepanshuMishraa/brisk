@@ -74,12 +74,10 @@ export function MainPage() {
 
   const handleViewStats = async () => {
     try {
-      await invoke<string>("resize_window_to_stats");
-      await new Promise((resolve) => setTimeout(resolve, 500));
       navigate("/stats");
+      await invoke<string>("resize_window_to_stats");
     } catch (error) {
       console.error("Failed to resize window to stats:", error);
-      navigate("/stats");
     }
   };
 
