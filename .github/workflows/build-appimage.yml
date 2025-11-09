@@ -1,0 +1,65 @@
+name: Build Tauri AppImage
+
+on:
+  push:
+    tags:
+      - "v*" # Runs on tags like v0.1.2, v1.0.0 etc.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install Rust toolchain
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # Install frontend deps
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install JS dependencies
+        run: pnpm install
+
+      # Build frontend
+      - name: Build frontend
+        run: pnpm build
+
+      # Prepare Linux AppImage dependencies
+      - name: Install AppImage build deps
+        run: sudo apt-get update && sudo apt-get install -y \
+          libgtk-3-dev \
+          libsoup-3.0-dev \
+          libwebkit2gtk-4.1-dev \
+          libfuse2 \
+          patchelf \
+          squashfs-tools \
+          desktop-file-utils
+
+      # Build Tauri AppImage with your separate config
+      - name: Build Tauri AppImage
+        run: pnpm tauri build --config src-tauri/tauri.bundle.conf.json
+
+      # Upload as GitHub artifact (optional but useful)
+      - name: Upload AppImage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Brisq-AppImage
+          path: src-tauri/target/release/bundle/appimage/*.AppImage
+
+      # Attach AppImage automatically to GitHub Releases
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: src-tauri/target/release/bundle/appimage/*.AppImage
